@@ -1,0 +1,44 @@
+{
+  "messages": [
+    {
+      "id": 1,
+      "type": "motivation",
+      "text": "Keep going. One difficult day does not define your journey."
+    },
+    {
+      "id": 2,
+      "type": "motivation",
+      "text": "You don't have to finish everything today. Just take the next step."
+    },
+    {
+      "id": 3,
+      "type": "corporate",
+      "text": "Your designation is your role, not your identity."
+    },
+    {
+      "id": 4,
+      "type": "corporate",
+      "text": "Deadlines come and go. Keep learning, keep growing."
+    },
+    {
+      "id": 5,
+      "type": "shayari",
+      "text": "Raaste mushkil zaroor hain, magar manzil namumkin nahi."
+    },
+    {
+      "id": 6,
+      "type": "shayari",
+      "text": "Thak kar rukna alag baat hai, haar maan lena alag."
+    },
+    {
+      "id": 7,
+      "type": "motivation",
+      "text": "A slow day is still a day of progress."
+    },
+    {
+      "id": 8,
+      "type": "corporate",
+      "text": "Work hard, but don't forget to live beyond your screen."
+    }
+  ]
+}

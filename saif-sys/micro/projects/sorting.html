@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SORTING • VISUALIZER</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --bg-gradient-1: #06142E;
+            --bg-gradient-2: #0B2447;
+            --panel-bg: rgba(10, 25, 50, 0.45);
+            --text-primary: #ffffff;
+            --text-secondary: #b0d4f0;
+            --accent-color: #00E5FF;
+            --border-glow: rgba(0, 229, 255, 0.5);
+            --shadow-neon: 0 0 20px #00E5FF;
+            --bar-color: #4FC3F7;
+            --compare-color: #FFD700;
+            --swap-color: #FF4757;
+            --pivot-color: #AA00FF;
+            --sorted-color: #00FF88;
+            --control-bg: rgba(0, 20, 40, 0.7);
+            --pillar-glow: rgba(79, 195, 247, 0.3);
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, var(--bg-gradient-1), var(--bg-gradient-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated particles */
+        .particle {
+            position: fixed;
+            width: 3px;
+            height: 3px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            opacity: 0.2;
+            pointer-events: none;
+            animation: floatParticle 15s infinite linear;
+        }
+
+        @keyframes floatParticle {
+            0% { transform: translateY(-100vh) translateX(0); opacity: 0; }
+            50% { opacity: 0.3; }
+            100% { transform: translateY(100vh) translateX(50px); opacity: 0; }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 3rem;
+            padding: 2rem;
+            box-shadow: 0 30px 60px -15px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .title {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: var(--shadow-neon);
+            letter-spacing: 3px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            letter-spacing: 4px;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            background: rgba(0,0,0,0.3);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .control-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .control-select, .control-slider {
+            background: var(--control-bg);
+            border: 1px solid var(--accent-color);
+            color: var(--text-primary);
+            padding: 0.8rem 1rem;
+            border-radius: 1.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+
+        .control-select:hover, .control-slider:hover {
+            box-shadow: var(--shadow-neon);
+        }
+
+        .control-select option {
+            background: var(--bg-gradient-1);
+            color: var(--text-primary);
+        }
+
+        .control-slider {
+            padding: 0.5rem;
+            cursor: pointer;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--accent-color);
+            color: var(--text-primary);
+            padding: 0.8rem 1.5rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: var(--accent-color);
+            color: var(--bg-gradient-1);
+            box-shadow: var(--shadow-neon);
+            transform: scale(1.05);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn.active {
+            background: var(--accent-color);
+            color: var(--bg-gradient-1);
+        }
+
+        /* Stats Panel */
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-value {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-shadow: var(--shadow-neon);
+        }
+
+        .stat-desc {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-top: 0.2rem;
+        }
+
+        /* Real-time Array Display */
+        .array-display {
+            background: rgba(0,0,0,0.2);
+            border-radius: 1.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .array-value {
+            background: var(--control-bg);
+            border: 1px solid var(--accent-color);
+            color: var(--text-primary);
+            padding: 0.3rem 0.8rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .array-value.comparing {
+            background: var(--compare-color);
+            color: #000;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px var(--compare-color);
+        }
+
+        .array-value.swapping {
+            background: var(--swap-color);
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px var(--swap-color);
+        }
+
+        .array-value.pivot {
+            background: var(--pivot-color);
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px var(--pivot-color);
+        }
+
+        .array-value.sorted {
+            background: var(--sorted-color);
+            color: #000;
+            box-shadow: 0 0 15px var(--sorted-color);
+        }
+
+        /* Complexity Panel */
+        .complexity-panel {
+            background: rgba(0,0,0,0.2);
+            border-radius: 1.5rem;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .complexity-item {
+            text-align: center;
+        }
+
+        .complexity-title {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .complexity-value {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-shadow: var(--shadow-neon);
+        }
+
+        /* Visualization Container */
+        .visualization-container {
+            background: rgba(0,0,0,0.2);
+            border-radius: 2rem;
+            padding: 2rem 1rem;
+            margin-bottom: 2rem;
+            min-height: 400px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 2px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Pillar Styles - IMPROVED */
+        .pillar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .pillar {
+            width: 100%;
+            background: linear-gradient(180deg, var(--bar-color), #1E88E5);
+            border-radius: 8px 8px 0 0;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 15px var(--pillar-glow);
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-bottom: none;
+        }
+
+        .pillar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 30%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.3), transparent);
+            border-radius: 8px 8px 0 0;
+        }
+
+        .pillar-value {
+            color: var(--text-primary);
+            font-size: 0.7rem;
+            margin-top: 0.2rem;
+            text-shadow: 0 0 5px var(--accent-color);
+            font-weight: 600;
+        }
+
+        .pillar.comparing {
+            background: linear-gradient(180deg, var(--compare-color), #FFA500);
+            box-shadow: 0 0 25px var(--compare-color);
+            transform: scale(1.02);
+        }
+
+        .pillar.swapping {
+            background: linear-gradient(180deg, var(--swap-color), #FF0000);
+            box-shadow: 0 0 25px var(--swap-color);
+            transform: scale(1.05);
+        }
+
+        .pillar.pivot {
+            background: linear-gradient(180deg, var(--pivot-color), #800080);
+            box-shadow: 0 0 25px var(--pivot-color);
+            transform: scale(1.05);
+        }
+
+        .pillar.sorted {
+            background: linear-gradient(180deg, var(--sorted-color), #00FF00);
+            box-shadow: 0 0 25px var(--sorted-color);
+        }
+
+        /* Step Controls */
+        .step-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .footer {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .title { font-size: 2rem; }
+            .control-panel { grid-template-columns: 1fr; }
+            .button-group { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particles -->
+    <div id="particles"></div>
+
+    <div class="container">
+        <div class="header">
+            <div class="title">SORTING • VISUALIZER</div>
+            <div class="subtitle">PILLARS • REAL-TIME</div>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <div class="control-group">
+                <div class="control-label">📊 ALGORITHM</div>
+                <select class="control-select" id="algorithmSelect">
+                    <option value="bubble">Bubble Sort - O(n²)</option>
+                    <option value="selection">Selection Sort - O(n²)</option>
+                    <option value="insertion">Insertion Sort - O(n²)</option>
+                    <option value="merge" selected>Merge Sort - O(n log n)</option>
+                    <option value="quick">Quick Sort - O(n log n)</option>
+                    <option value="heap">Heap Sort - O(n log n)</option>
+                    <option value="counting">Counting Sort - O(n+k)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <div class="control-label">📏 SIZE <span id="sizeValue">30</span></div>
+                <input type="range" class="control-slider" id="sizeSlider" min="5" max="50" value="30">
+            </div>
+
+            <div class="control-group">
+                <div class="control-label">⚡ SPEED <span id="speedValue">50</span></div>
+                <input type="range" class="control-slider" id="speedSlider" min="1" max="100" value="50">
+            </div>
+
+            <div class="button-group">
+                <button class="btn" id="generateBtn">🔄 Generate</button>
+                <button class="btn" id="startBtn">▶ Start</button>
+                <button class="btn" id="pauseBtn" disabled>⏸️ Pause</button>
+                <button class="btn" id="resumeBtn" disabled>▶ Resume</button>
+                <button class="btn" id="resetBtn">⏹️ Reset</button>
+            </div>
+        </div>
+
+        <!-- Stats Panel -->
+        <div class="stats-panel">
+            <div class="stat-item">
+                <div class="stat-label">COMPARISONS</div>
+                <div class="stat-value" id="comparisons">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">SWAPS</div>
+                <div class="stat-value" id="swaps">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">EXECUTION TIME</div>
+                <div class="stat-value" id="execTime">0ms</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">ARRAY SIZE</div>
+                <div class="stat-value" id="arraySize">30</div>
+            </div>
+        </div>
+
+        <!-- Real-time Array Values Display -->
+        <div class="array-display" id="arrayDisplay"></div>
+
+        <!-- Complexity Panel -->
+        <div class="complexity-panel" id="complexityPanel">
+            <div class="complexity-item">
+                <div class="complexity-title">TIME COMPLEXITY</div>
+                <div class="complexity-value" id="timeComplexity">O(n log n)</div>
+            </div>
+            <div class="complexity-item">
+                <div class="complexity-title">SPACE COMPLEXITY</div>
+                <div class="complexity-value" id="spaceComplexity">O(n)</div>
+            </div>
+            <div class="complexity-item">
+                <div class="complexity-title">DESCRIPTION</div>
+                <div class="complexity-value" id="algoDesc">Divide and conquer</div>
+            </div>
+        </div>
+
+        <!-- Visualization Area with Pillars -->
+        <div class="visualization-container" id="visualization"></div>
+
+        <!-- Step Controls -->
+        <div class="step-controls">
+            <button class="btn" id="stepPrevBtn" disabled>⏮️ Previous</button>
+            <button class="btn" id="stepNextBtn" disabled>⏭️ Next</button>
+        </div>
+
+        <div class="footer">🏛️ PILLARS • COMPARE • SWAP • SORT</div>
+    </div>
+
+    <script>
+        // ========== GLOBAL VARIABLES ==========
+        let array = [];
+        let arraySize = 30;
+        let speed = 50;
+        let comparisons = 0;
+        let swaps = 0;
+        let startTime = 0;
+        let isPaused = false;
+        let isSorting = false;
+        let pausePromise;
+        let pauseResolve;
+        let animationId;
+
+        // DOM Elements
+        const visualization = document.getElementById('visualization');
+        const arrayDisplay = document.getElementById('arrayDisplay');
+        const algorithmSelect = document.getElementById('algorithmSelect');
+        const sizeSlider = document.getElementById('sizeSlider');
+        const speedSlider = document.getElementById('speedSlider');
+        const sizeValue = document.getElementById('sizeValue');
+        const speedValue = document.getElementById('speedValue');
+        const comparisonsEl = document.getElementById('comparisons');
+        const swapsEl = document.getElementById('swaps');
+        const execTimeEl = document.getElementById('execTime');
+        const arraySizeEl = document.getElementById('arraySize');
+        const timeComplexityEl = document.getElementById('timeComplexity');
+        const spaceComplexityEl = document.getElementById('spaceComplexity');
+        const algoDescEl = document.getElementById('algoDesc');
+        const generateBtn = document.getElementById('generateBtn');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resumeBtn = document.getElementById('resumeBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const stepPrevBtn = document.getElementById('stepPrevBtn');
+        const stepNextBtn = document.getElementById('stepNextBtn');
+
+        // Algorithm complexities and descriptions
+        const algoInfo = {
+            bubble: {
+                time: 'O(n²)',
+                space: 'O(1)',
+                desc: 'Repeatedly swaps adjacent elements'
+            },
+            selection: {
+                time: 'O(n²)',
+                space: 'O(1)',
+                desc: 'Finds minimum and places at beginning'
+            },
+            insertion: {
+                time: 'O(n²)',
+                space: 'O(1)',
+                desc: 'Builds sorted array one by one'
+            },
+            merge: {
+                time: 'O(n log n)',
+                space: 'O(n)',
+                desc: 'Divide, sort, and merge'
+            },
+            quick: {
+                time: 'O(n log n)',
+                space: 'O(log n)',
+                desc: 'Uses pivot to partition'
+            },
+            heap: {
+                time: 'O(n log n)',
+                space: 'O(1)',
+                desc: 'Builds heap and extracts max'
+            },
+            counting: {
+                time: 'O(n+k)',
+                space: 'O(k)',
+                desc: 'Counts occurrences of elements'
+            }
+        };
+
+        // Particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 10 + 's';
+                particle.style.animationDuration = 10 + Math.random() * 20 + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+        createParticles();
+
+        // ========== ARRAY GENERATION ==========
+        function generateArray() {
+            array = [];
+            for (let i = 0; i < arraySize; i++) {
+                array.push(Math.floor(Math.random() * 90) + 10); // Values between 10-99
+            }
+            comparisons = 0;
+            swaps = 0;
+            updateStats();
+            renderVisualization();
+            updateArrayDisplay();
+        }
+
+        function renderVisualization() {
+            visualization.innerHTML = '';
+            const maxValue = Math.max(...array);
+            
+            array.forEach((value, index) => {
+                const pillarContainer = document.createElement('div');
+                pillarContainer.className = 'pillar-container';
+                pillarContainer.style.width = `${90 / arraySize}%`;
+                
+                const pillar = document.createElement('div');
+                pillar.className = 'pillar';
+                pillar.style.height = `${(value / maxValue) * 100}%`;
+                pillar.setAttribute('data-index', index);
+                pillar.setAttribute('data-value', value);
+                
+                const valueLabel = document.createElement('div');
+                valueLabel.className = 'pillar-value';
+                valueLabel.textContent = value;
+                
+                pillarContainer.appendChild(pillar);
+                pillarContainer.appendChild(valueLabel);
+                visualization.appendChild(pillarContainer);
+            });
+        }
+
+        function updateArrayDisplay() {
+            arrayDisplay.innerHTML = '';
+            array.forEach((value, index) => {
+                const valueEl = document.createElement('span');
+                valueEl.className = 'array-value';
+                valueEl.textContent = value;
+                valueEl.setAttribute('data-index', index);
+                arrayDisplay.appendChild(valueEl);
+            });
+        }
+
+        // ========== BAR COLOR MANAGEMENT ==========
+        function setPillarState(indices, state) {
+            const pillars = document.querySelectorAll('.pillar');
+            const valueEls = document.querySelectorAll('.array-value');
+            
+            indices.forEach(index => {
+                pillars[index].classList.remove('comparing', 'swapping', 'pivot', 'sorted');
+                valueEls[index].classList.remove('comparing', 'swapping', 'pivot', 'sorted');
+                
+                if (state) {
+                    pillars[index].classList.add(state);
+                    valueEls[index].classList.add(state);
+                }
+            });
+        }
+
+        function markSorted(indices) {
+            const pillars = document.querySelectorAll('.pillar');
+            const valueEls = document.querySelectorAll('.array-value');
+            
+            indices.forEach(index => {
+                pillars[index].classList.remove('comparing', 'swapping', 'pivot');
+                pillars[index].classList.add('sorted');
+                valueEls[index].classList.remove('comparing', 'swapping', 'pivot');
+                valueEls[index].classList.add('sorted');
+            });
+        }
+
+        // ========== ANIMATION DELAY ==========
+        async function delay() {
+            if (isPaused) {
+                await new Promise(resolve => {
+                    pauseResolve = resolve;
+                });
+            }
+            const delayTime = 200 - (speed * 1.5);
+            await new Promise(resolve => setTimeout(resolve, Math.max(10, delayTime)));
+        }
+
+        // ========== STATS UPDATE ==========
+        function updateStats() {
+            comparisonsEl.textContent = comparisons;
+            swapsEl.textContent = swaps;
+            arraySizeEl.textContent = arraySize;
+            
+            const algo = algorithmSelect.value;
+            timeComplexityEl.textContent = algoInfo[algo].time;
+            spaceComplexityEl.textContent = algoInfo[algo].space;
+            algoDescEl.textContent = algoInfo[algo].desc;
+        }
+
+        // ========== SORTING ALGORITHMS ==========
+        async function bubbleSort() {
+            const n = array.length;
+            for (let i = 0; i < n - 1; i++) {
+                for (let j = 0; j < n - i - 1; j++) {
+                    if (!isSorting) return;
+                    
+                    // Highlight comparing elements
+                    setPillarState([j, j + 1], 'comparing');
+                    comparisons++;
+                    updateStats();
+                    await delay();
+
+                    if (array[j] > array[j + 1]) {
+                        // Swap
+                        setPillarState([j, j + 1], 'swapping');
+                        [array[j], array[j + 1]] = [array[j + 1], array[j]];
+                        swaps++;
+                        updateStats();
+                        renderVisualization();
+                        updateArrayDisplay();
+                        await delay();
+                    }
+                    
+                    setPillarState([j, j + 1], null);
+                }
+                markSorted([n - i - 1]);
+            }
+            markSorted([0]);
+        }
+
+        async function selectionSort() {
+            const n = array.length;
+            for (let i = 0; i < n - 1; i++) {
+                let minIdx = i;
+                for (let j = i + 1; j < n; j++) {
+                    if (!isSorting) return;
+                    
+                    setPillarState([minIdx, j], 'comparing');
+                    comparisons++;
+                    updateStats();
+                    await delay();
+
+                    if (array[j] < array[minIdx]) {
+                        setPillarState([minIdx], null);
+                        minIdx = j;
+                    }
+                    setPillarState([j], null);
+                }
+                
+                if (minIdx !== i) {
+                    setPillarState([i, minIdx], 'swapping');
+                    [array[i], array[minIdx]] = [array[minIdx], array[i]];
+                    swaps++;
+                    updateStats();
+                    renderVisualization();
+                    updateArrayDisplay();
+                    await delay();
+                }
+                
+                markSorted([i]);
+            }
+            markSorted([n - 1]);
+        }
+
+        async function insertionSort() {
+            const n = array.length;
+            for (let i = 1; i < n; i++) {
+                let key = array[i];
+                let j = i - 1;
+                
+                while (j >= 0 && array[j] > key) {
+                    if (!isSorting) return;
+                    
+                    setPillarState([j, j + 1], 'comparing');
+                    comparisons++;
+                    updateStats();
+                    await delay();
+                    
+                    setPillarState([j, j + 1], 'swapping');
+                    array[j + 1] = array[j];
+                    swaps++;
+                    updateStats();
+                    renderVisualization();
+                    updateArrayDisplay();
+                    await delay();
+                    
+                    setPillarState([j, j + 1], null);
+                    j--;
+                }
+                array[j + 1] = key;
+                renderVisualization();
+                updateArrayDisplay();
+            }
+            markSorted([...Array(n).keys()]);
+        }
+
+        async function mergeSort(arr = array, left = 0, right = array.length - 1) {
+            if (left >= right || !isSorting) return;
+            
+            const mid = Math.floor((left + right) / 2);
+            await mergeSort(arr, left, mid);
+            await mergeSort(arr, mid + 1, right);
+            await merge(arr, left, mid, right);
+        }
+
+        async function merge(arr, left, mid, right) {
+            const leftArr = arr.slice(left, mid + 1);
+            const rightArr = arr.slice(mid + 1, right + 1);
+            
+            let i = 0, j = 0, k = left;
+            
+            while (i < leftArr.length && j < rightArr.length) {
+                if (!isSorting) return;
+                
+                setPillarState([left + i, mid + 1 + j], 'comparing');
+                comparisons++;
+                updateStats();
+                await delay();
+                
+                if (leftArr[i] <= rightArr[j]) {
+                    arr[k] = leftArr[i];
+                    i++;
+                } else {
+                    arr[k] = rightArr[j];
+                    j++;
+                }
+                swaps++;
+                updateStats();
+                renderVisualization();
+                updateArrayDisplay();
+                await delay();
+                setPillarState([k], null);
+                k++;
+            }
+            
+            while (i < leftArr.length) {
+                arr[k] = leftArr[i];
+                i++;
+                k++;
+                renderVisualization();
+                updateArrayDisplay();
+                await delay();
+            }
+            
+            while (j < rightArr.length) {
+                arr[k] = rightArr[j];
+                j++;
+                k++;
+                renderVisualization();
+                updateArrayDisplay();
+                await delay();
+            }
+            
+            for (let idx = left; idx <= right; idx++) {
+                markSorted([idx]);
+            }
+        }
+
+        async function quickSort(arr = array, low = 0, high = array.length - 1) {
+            if (low < high && isSorting) {
+                const pi = await partition(arr, low, high);
+                await quickSort(arr, low, pi - 1);
+                await quickSort(arr, pi + 1, high);
+            }
+        }
+
+        async function partition(arr, low, high) {
+            const pivot = arr[high];
+            setPillarState([high], 'pivot');
+            
+            let i = low - 1;
+            
+            for (let j = low; j < high; j++) {
+                if (!isSorting) return;
+                
+                setPillarState([j], 'comparing');
+                comparisons++;
+                updateStats();
+                await delay();
+                
+                if (arr[j] < pivot) {
+                    i++;
+                    setPillarState([i, j], 'swapping');
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                    swaps++;
+                    updateStats();
+                    renderVisualization();
+                    updateArrayDisplay();
+                    await delay();
+                }
+                setPillarState([j], null);
+            }
+            
+            setPillarState([i + 1, high], 'swapping');
+            [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
+            swaps++;
+            updateStats();
+            renderVisualization();
+            updateArrayDisplay();
+            await delay();
+            
+            setPillarState([high], null);
+            return i + 1;
+        }
+
+        async function heapSort() {
+            const n = array.length;
+            
+            // Build heap
+            for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+                await heapify(n, i);
+            }
+            
+            // Extract elements
+            for (let i = n - 1; i > 0; i--) {
+                if (!isSorting) return;
+                
+                setPillarState([0, i], 'swapping');
+                [array[0], array[i]] = [array[i], array[0]];
+                swaps++;
+                updateStats();
+                renderVisualization();
+                updateArrayDisplay();
+                await delay();
+                
+                markSorted([i]);
+                await heapify(i, 0);
+            }
+            markSorted([0]);
+        }
+
+        async function heapify(n, i) {
+            let largest = i;
+            const left = 2 * i + 1;
+            const right = 2 * i + 2;
+            
+            if (left < n) {
+                setPillarState([largest, left], 'comparing');
+                comparisons++;
+                updateStats();
+                await delay();
+                
+                if (array[left] > array[largest]) {
+                    largest = left;
+                }
+                setPillarState([left], null);
+            }
+            
+            if (right < n) {
+                setPillarState([largest, right], 'comparing');
+                comparisons++;
+                updateStats();
+                await delay();
+                
+                if (array[right] > array[largest]) {
+                    largest = right;
+                }
+                setPillarState([right], null);
+            }
+            
+            if (largest !== i) {
+                setPillarState([i, largest], 'swapping');
+                [array[i], array[largest]] = [array[largest], array[i]];
+                swaps++;
+                updateStats();
+                renderVisualization();
+                updateArrayDisplay();
+                await delay();
+                setPillarState([i, largest], null);
+                
+                await heapify(n, largest);
+            }
+        }
+
+        async function countingSort() {
+            const max = Math.max(...array);
+            const min = Math.min(...array);
+            const range = max - min + 1;
+            const count = new Array(range).fill(0);
+            const output = new Array(array.length);
+            
+            // Store count
+            for (let i = 0; i < array.length; i++) {
+                count[array[i] - min]++;
+            }
+            
+            // Cumulative count
+            for (let i = 1; i < range; i++) {
+                count[i] += count[i - 1];
+            }
+            
+            // Build output
+            for (let i = array.length - 1; i >= 0; i--) {
+                if (!isSorting) return;
+                
+                setPillarState([i], 'comparing');
+                output[count[array[i] - min] - 1] = array[i];
+                count[array[i] - min]--;
+                comparisons++;
+                await delay();
+            }
+            
+            // Copy back
+            for (let i = 0; i < array.length; i++) {
+                if (!isSorting) return;
+                
+                setPillarState([i], 'swapping');
+                array[i] = output[i];
+                swaps++;
+                renderVisualization();
+                updateArrayDisplay();
+                await delay();
+            }
+            
+            markSorted([...Array(array.length).keys()]);
+        }
+
+        // ========== SORTING CONTROLS ==========
+        async function startSorting() {
+            if (isSorting) return;
+            
+            isSorting = true;
+            isPaused = false;
+            startTime = Date.now();
+            
+            disableControls(true);
+            
+            const algorithm = algorithmSelect.value;
+            
+            switch(algorithm) {
+                case 'bubble':
+                    await bubbleSort();
+                    break;
+                case 'selection':
+                    await selectionSort();
+                    break;
+                case 'insertion':
+                    await insertionSort();
+                    break;
+                case 'merge':
+                    await mergeSort();
+                    break;
+                case 'quick':
+                    await quickSort();
+                    break;
+                case 'heap':
+                    await heapSort();
+                    break;
+                case 'counting':
+                    await countingSort();
+                    break;
+            }
+            
+            if (isSorting) {
+                const endTime = Date.now();
+                execTimeEl.textContent = (endTime - startTime) + 'ms';
+                
+                // Mark all as sorted
+                markSorted([...Array(array.length).keys()]);
+            }
+            
+            isSorting = false;
+            disableControls(false);
+        }
+
+        function pauseSorting() {
+            if (isSorting && !isPaused) {
+                isPaused = true;
+                pauseBtn.disabled = true;
+                resumeBtn.disabled = false;
+            }
+        }
+
+        function resumeSorting() {
+            if (isSorting && isPaused) {
+                isPaused = false;
+                pauseBtn.disabled = false;
+                resumeBtn.disabled = true;
+                if (pauseResolve) {
+                    pauseResolve();
+                    pauseResolve = null;
+                }
+            }
+        }
+
+        function resetSorting() {
+            isSorting = false;
+            isPaused = false;
+            generateArray();
+            disableControls(false);
+            if (pauseResolve) {
+                pauseResolve();
+                pauseResolve = null;
+            }
+            execTimeEl.textContent = '0ms';
+        }
+
+        function disableControls(disable) {
+            generateBtn.disabled = disable;
+            startBtn.disabled = disable;
+            algorithmSelect.disabled = disable;
+            sizeSlider.disabled = disable;
+            pauseBtn.disabled = !disable;
+            resumeBtn.disabled = true;
+            stepPrevBtn.disabled = true;
+            stepNextBtn.disabled = true;
+        }
+
+        // ========== EVENT LISTENERS ==========
+        sizeSlider.addEventListener('input', (e) => {
+            arraySize = parseInt(e.target.value);
+            sizeValue.textContent = arraySize;
+            generateArray();
+        });
+
+        speedSlider.addEventListener('input', (e) => {
+            speed = parseInt(e.target.value);
+            speedValue.textContent = speed;
+        });
+
+        algorithmSelect.addEventListener('change', updateStats);
+
+        generateBtn.addEventListener('click', generateArray);
+        startBtn.addEventListener('click', startSorting);
+        pauseBtn.addEventListener('click', pauseSorting);
+        resumeBtn.addEventListener('click', resumeSorting);
+        resetBtn.addEventListener('click', resetSorting);
+
+        // Initialize
+        generateArray();
+        updateStats();
+    </script>
+</body>
+</html>

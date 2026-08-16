@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GITHUB • PROFILE FINDER</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Theme variables */
+        :root {
+            --bg-gradient-1: #06142E;
+            --bg-gradient-2: #0B2447;
+            --panel-bg: rgba(10, 25, 50, 0.45);
+            --card-bg: rgba(10, 25, 50, 0.6);
+            --text-primary: #ffffff;
+            --text-secondary: #b0d4f0;
+            --accent-color: #00E5FF;
+            --border-glow: rgba(0, 229, 255, 0.5);
+            --shadow-neon: 0 0 20px #00E5FF;
+            --control-bg: rgba(0, 20, 40, 0.7);
+            --success-color: #00ff88;
+            --error-color: #ff4d4d;
+            --stat-bg: rgba(255,255,255,0.05);
+        }
+
+        /* Light theme */
+        [data-theme="light"] {
+            --bg-gradient-1: #E8F0F2;
+            --bg-gradient-2: #B8D8E3;
+            --panel-bg: rgba(255, 255, 255, 0.7);
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --text-primary: #2C3E50;
+            --text-secondary: #34495E;
+            --accent-color: #3498DB;
+            --border-glow: rgba(52, 152, 219, 0.5);
+            --shadow-neon: 0 0 20px #3498DB;
+            --control-bg: rgba(255, 255, 255, 0.9);
+            --stat-bg: rgba(0,0,0,0.05);
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, var(--bg-gradient-1), var(--bg-gradient-2));
+            transition: all 0.3s ease;
+            position: relative;
+            overflow-x: hidden;
+            padding: 1rem;
+        }
+
+        /* Animated particles */
+        .particle {
+            position: fixed;
+            width: 3px;
+            height: 3px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            opacity: 0.2;
+            pointer-events: none;
+            animation: floatParticle 15s infinite linear;
+        }
+
+        @keyframes floatParticle {
+            0% { transform: translateY(-100vh) translateX(0); opacity: 0; }
+            50% { opacity: 0.3; }
+            100% { transform: translateY(100vh) translateX(50px); opacity: 0; }
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+        }
+
+        .title {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: var(--shadow-neon);
+            letter-spacing: 3px;
+            animation: titleGlow 2s infinite;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { text-shadow: 0 0 20px var(--accent-color); }
+            50% { text-shadow: 0 0 40px var(--accent-color); }
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            letter-spacing: 4px;
+            margin-top: 0.5rem;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+        }
+
+        .theme-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--accent-color);
+            color: var(--text-primary);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .theme-btn:hover {
+            transform: rotate(180deg);
+            box-shadow: var(--shadow-neon);
+        }
+
+        /* Search Section */
+        .search-section {
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 3rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 20px 40px -15px rgba(0,0,0,0.5);
+        }
+
+        .search-container {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-color);
+            font-size: 1.2rem;
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--control-bg);
+            border: 2px solid var(--accent-color);
+            color: var(--text-primary);
+            padding: 1.2rem 1.2rem 1.2rem 3.5rem;
+            border-radius: 3rem;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: var(--shadow-neon);
+            transform: scale(1.02);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.6;
+        }
+
+        .search-btn {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid var(--accent-color);
+            color: var(--text-primary);
+            padding: 1.2rem 2.5rem;
+            border-radius: 3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .search-btn:hover:not(:disabled) {
+            background: var(--accent-color);
+            color: var(--bg-gradient-1);
+            box-shadow: var(--shadow-neon);
+            transform: scale(1.05);
+        }
+
+        .search-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Recent Searches */
+        .recent-searches {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .recent-chip {
+            background: var(--stat-bg);
+            border: 1px solid var(--accent-color);
+            color: var(--text-primary);
+            padding: 0.5rem 1.2rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .recent-chip:hover {
+            background: var(--accent-color);
+            color: var(--bg-gradient-1);
+            transform: translateY(-2px);
+        }
+
+        /* Loading Skeleton */
+        .skeleton {
+            background: var(--card-bg);
+            border-radius: 2rem;
+            padding: 2rem;
+            animation: skeletonPulse 1.5s infinite;
+        }
+
+        .skeleton-line {
+            height: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 1rem;
+            margin: 1rem 0;
+        }
+
+        .skeleton-line.short { width: 60%; }
+        .skeleton-line.medium { width: 80%; }
+        .skeleton-line.long { width: 100%; }
+
+        @keyframes skeletonPulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        /* Profile Card */
+        .profile-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 3rem;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 20px 40px -15px rgba(0,0,0,0.5);
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .profile-header {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 4px solid var(--accent-color);
+            box-shadow: var(--shadow-neon);
+            transition: all 0.3s ease;
+        }
+
+        .avatar:hover {
+            transform: scale(1.05);
+            rotate: 5deg;
+        }
+
+        .profile-title {
+            flex: 1;
+        }
+
+        .profile-name {
+            color: var(--text-primary);
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-username {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .profile-bio {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            background: var(--stat-bg);
+            border-radius: 2rem;
+            padding: 1.2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-neon);
+        }
+
+        .stat-value {
+            color: var(--text-primary);
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+        }
+
+        .profile-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .detail-icon {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+        }
+
+        .detail-text {
+            color: var(--text-primary);
+        }
+
+        .detail-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .detail-link:hover {
+            text-decoration: underline;
+            text-shadow: var(--shadow-neon);
+        }
+
+        /* Repos Section */
+        .repos-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            color: var(--text-primary);
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title-icon {
+            color: var(--accent-color);
+        }
+
+        .repos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .repo-card {
+            background: var(--stat-bg);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .repo-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-neon);
+        }
+
+        .repo-name {
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .repo-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .repo-stats {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .repo-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .repo-stat i {
+            color: var(--accent-color);
+        }
+
+        .repo-language {
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2rem;
+            color: var(--accent-color);
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .repo-link {
+            display: inline-block;
+            margin-top: 1rem;
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .repo-link:hover {
+            text-shadow: var(--shadow-neon);
+            transform: translateX(5px);
+        }
+
+        /* Extra Stats */
+        .extra-stats {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 3rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .extra-stat {
+            text-align: center;
+        }
+
+        .extra-stat-value {
+            color: var(--accent-color);
+            font-size: 2rem;
+            font-weight: 700;
+            text-shadow: var(--shadow-neon);
+        }
+
+        .extra-stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+        }
+
+        /* Error Message */
+        .error-message {
+            background: rgba(255, 77, 77, 0.1);
+            border: 1px solid var(--error-color);
+            color: var(--error-color);
+            padding: 1.5rem;
+            border-radius: 2rem;
+            text-align: center;
+            margin: 2rem 0;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        /* Rate Limit Warning */
+        .rate-limit {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid #ffc107;
+            color: #ffc107;
+            padding: 1rem;
+            border-radius: 2rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin: 3rem 0 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .title { font-size: 2rem; }
+            .profile-header { flex-direction: column; text-align: center; }
+            .profile-details { justify-content: center; }
+            .repos-grid { grid-template-columns: 1fr; }
+            .search-container { flex-direction: column; }
+            .search-btn { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particles -->
+    <div id="particles"></div>
+
+    <!-- Theme Toggle -->
+    <div class="theme-toggle">
+        <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="title">GITHUB FINDER</div>
+            <div class="subtitle">PROFILE • REPOS • STATS</div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <div class="search-container">
+                <div class="input-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" id="searchInput" placeholder="Enter GitHub username..." value="octocat">
+                </div>
+                <button class="search-btn" id="searchBtn">
+                    <span>🔍</span> Search
+                </button>
+            </div>
+            
+            <!-- Recent Searches -->
+            <div class="recent-searches" id="recentSearches"></div>
+        </div>
+
+        <!-- Loading Skeleton -->
+        <div id="skeletonLoader" style="display: none;">
+            <div class="skeleton">
+                <div class="skeleton-line short"></div>
+                <div class="skeleton-line medium"></div>
+                <div class="skeleton-line long"></div>
+                <div class="skeleton-line medium"></div>
+                <div class="skeleton-line short"></div>
+            </div>
+        </div>
+
+        <!-- Profile Section -->
+        <div id="profileSection" style="display: none;"></div>
+
+        <!-- Repos Section -->
+        <div id="reposSection" style="display: none;"></div>
+
+        <!-- Extra Stats Section -->
+        <div id="extraStats" style="display: none;"></div>
+
+        <!-- Error Section -->
+        <div id="errorSection" style="display: none;"></div>
+
+        <!-- Rate Limit Warning -->
+        <div id="rateLimit" class="rate-limit" style="display: none;">
+            ⚠️ API rate limit exceeded. Please try again later or add a personal access token.
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            ⚡ Powered by GitHub API • Search any GitHub profile
+        </div>
+    </div>
+
+    <script>
+        // ========== GLOBAL VARIABLES ==========
+        let currentTheme = 'dark';
+        let recentSearches = JSON.parse(localStorage.getItem('recentSearches')) || [];
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const skeletonLoader = document.getElementById('skeletonLoader');
+        const profileSection = document.getElementById('profileSection');
+        const reposSection = document.getElementById('reposSection');
+        const extraStats = document.getElementById('extraStats');
+        const errorSection = document.getElementById('errorSection');
+        const rateLimit = document.getElementById('rateLimit');
+        const recentSearchesEl = document.getElementById('recentSearches');
+        const themeBtn = document.getElementById('themeBtn');
+
+        // Particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 10 + 's';
+                particle.style.animationDuration = 10 + Math.random() * 20 + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+        createParticles();
+
+        // ========== RECENT SEARCHES ==========
+        function updateRecentSearches() {
+            recentSearchesEl.innerHTML = recentSearches.map(username => `
+                <span class="recent-chip" onclick="searchUsername('${username}')">${username}</span>
+            `).join('');
+        }
+
+        function addToRecent(username) {
+            if (!recentSearches.includes(username)) {
+                recentSearches.unshift(username);
+                if (recentSearches.length > 5) recentSearches.pop();
+                localStorage.setItem('recentSearches', JSON.stringify(recentSearches));
+                updateRecentSearches();
+            }
+        }
+
+        function searchUsername(username) {
+            searchInput.value = username;
+            fetchUserData();
+        }
+
+        // ========== API FUNCTIONS ==========
+        async function fetchUserData() {
+            const username = searchInput.value.trim();
+            if (!username) return;
+
+            // Show loading
+            showLoading(true);
+            hideAllSections();
+            rateLimit.style.display = 'none';
+
+            try {
+                // Fetch user data
+                const userResponse = await fetch(`https://api.github.com/users/${username}`);
+                
+                // Check rate limit
+                if (userResponse.status === 403) {
+                    rateLimit.style.display = 'block';
+                    showLoading(false);
+                    return;
+                }
+                
+                if (!userResponse.ok) {
+                    if (userResponse.status === 404) {
+                        showError('User not found! Please check the username.');
+                    } else {
+                        showError('Something went wrong. Please try again.');
+                    }
+                    showLoading(false);
+                    return;
+                }
+
+                const userData = await userResponse.json();
+                
+                // Fetch repos
+                const reposResponse = await fetch(`https://api.github.com/users/${username}/repos?per_page=100&sort=updated`);
+                const reposData = await reposResponse.json();
+                
+                // Process data
+                const sortedRepos = reposData.sort((a, b) => b.stargazers_count - a.stargazers_count).slice(0, 6);
+                
+                // Calculate extra stats
+                const totalStars = reposData.reduce((sum, repo) => sum + repo.stargazers_count, 0);
+                const languages = reposData.map(repo => repo.language).filter(lang => lang);
+                const topLanguage = getTopLanguage(languages);
+                
+                // Render everything
+                renderProfile(userData);
+                renderRepos(sortedRepos);
+                renderExtraStats(userData, totalStars, topLanguage);
+                
+                // Add to recent
+                addToRecent(username);
+                
+                showLoading(false);
+                profileSection.style.display = 'block';
+                reposSection.style.display = 'block';
+                extraStats.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Network error. Please check your connection.');
+                showLoading(false);
+            }
+        }
+
+        function getTopLanguage(languages) {
+            if (languages.length === 0) return 'N/A';
+            
+            const counts = {};
+            languages.forEach(lang => {
+                counts[lang] = (counts[lang] || 0) + 1;
+            });
+            
+            return Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
+        }
+
+        // ========== RENDERING FUNCTIONS ==========
+        function renderProfile(user) {
+            const joinDate = new Date(user.created_at).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            profileSection.innerHTML = `
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <img src="${user.avatar_url}" alt="${user.name}" class="avatar">
+                        <div class="profile-title">
+                            <h1 class="profile-name">${user.name || 'No name'}</h1>
+                            <div class="profile-username">@${user.login}</div>
+                            <p class="profile-bio">${user.bio || 'No bio available'}</p>
+                            
+                            <div class="profile-stats">
+                                <div class="stat-box">
+                                    <div class="stat-value">${user.public_repos}</div>
+                                    <div class="stat-label">Repositories</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-value">${user.followers}</div>
+                                    <div class="stat-label">Followers</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-value">${user.following}</div>
+                                    <div class="stat-label">Following</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-details">
+                        ${user.location ? `
+                            <div class="detail-item">
+                                <span class="detail-icon">📍</span>
+                                <span class="detail-text">${user.location}</span>
+                            </div>
+                        ` : ''}
+                        
+                        ${user.company ? `
+                            <div class="detail-item">
+                                <span class="detail-icon">🏢</span>
+                                <span class="detail-text">${user.company}</span>
+                            </div>
+                        ` : ''}
+                        
+                        ${user.blog ? `
+                            <div class="detail-item">
+                                <span class="detail-icon">🔗</span>
+                                <a href="${user.blog}" target="_blank" class="detail-link">${user.blog}</a>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="detail-item">
+                            <span class="detail-icon">📅</span>
+                            <span class="detail-text">Joined ${joinDate}</span>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <span class="detail-icon">📋</span>
+                            <button class="detail-link" onclick="copyProfileLink('${user.html_url}')">Copy Profile Link</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderRepos(repos) {
+            if (repos.length === 0) {
+                reposSection.innerHTML = `
+                    <div class="repos-section">
+                        <h2 class="section-title">
+                            <span class="section-title-icon">📚</span>
+                            No repositories found
+                        </h2>
+                    </div>
+                `;
+                return;
+            }
+
+            reposSection.innerHTML = `
+                <div class="repos-section">
+                    <h2 class="section-title">
+                        <span class="section-title-icon">📚</span>
+                        Top Repositories
+                    </h2>
+                    <div class="repos-grid">
+                        ${repos.map(repo => `
+                            <div class="repo-card">
+                                <h3 class="repo-name">${repo.name}</h3>
+                                <p class="repo-desc">${repo.description || 'No description available'}</p>
+                                <div class="repo-stats">
+                                    <span class="repo-stat">
+                                        <span>⭐</span> ${repo.stargazers_count}
+                                    </span>
+                                    <span class="repo-stat">
+                                        <span>🍴</span> ${repo.forks_count}
+                                    </span>
+                                </div>
+                                ${repo.language ? `
+                                    <span class="repo-language">${repo.language}</span>
+                                ` : ''}
+                                <a href="${repo.html_url}" target="_blank" class="repo-link">
+                                    View on GitHub →
+                                </a>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderExtraStats(user, totalStars, topLanguage) {
+            extraStats.innerHTML = `
+                <div class="extra-stats">
+                    <h2 class="section-title">
+                        <span class="section-title-icon">📊</span>
+                        Additional Stats
+                    </h2>
+                    <div class="stats-grid">
+                        <div class="extra-stat">
+                            <div class="extra-stat-value">${totalStars}</div>
+                            <div class="extra-stat-label">Total Stars Earned</div>
+                        </div>
+                        <div class="extra-stat">
+                            <div class="extra-stat-value">${topLanguage}</div>
+                            <div class="extra-stat-label">Most Used Language</div>
+                        </div>
+                        <div class="extra-stat">
+                            <div class="extra-stat-value">${user.public_gists || 0}</div>
+                            <div class="extra-stat-label">Public Gists</div>
+                        </div>
+                        <div class="extra-stat">
+                            <div class="extra-stat-value">${user.followers}</div>
+                            <div class="extra-stat-label">Community Reach</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showError(message) {
+            errorSection.style.display = 'block';
+            errorSection.innerHTML = `
+                <div class="error-message">
+                    ⚠️ ${message}
+                </div>
+            `;
+        }
+
+        function showLoading(show) {
+            skeletonLoader.style.display = show ? 'block' : 'none';
+            searchBtn.disabled = show;
+        }
+
+        function hideAllSections() {
+            profileSection.style.display = 'none';
+            reposSection.style.display = 'none';
+            extraStats.style.display = 'none';
+            errorSection.style.display = 'none';
+        }
+
+        // ========== UTILITY FUNCTIONS ==========
+        function copyProfileLink(url) {
+            navigator.clipboard.writeText(url);
+            alert('Profile link copied to clipboard!');
+        }
+
+        function toggleTheme() {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            themeBtn.textContent = currentTheme === 'dark' ? '🌙' : '☀️';
+        }
+
+        // ========== EVENT LISTENERS ==========
+        searchBtn.addEventListener('click', fetchUserData);
+        
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                fetchUserData();
+            }
+        });
+
+        // Load default profile
+        window.addEventListener('load', () => {
+            updateRecentSearches();
+            fetchUserData();
+        });
+    </script>
+</body>
+</html>

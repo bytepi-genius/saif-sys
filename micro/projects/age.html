@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AGE • CALCULATOR</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --bg-gradient-1: #141E30;
+            --bg-gradient-2: #243B55;
+            --panel-bg: rgba(255, 255, 255, 0.08);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --accent-color: #00E5FF;
+            --success-color: #00ff88;
+            --error-color: #ff4d4d;
+            --border-glow: rgba(0, 229, 255, 0.5);
+            --shadow-neon: 0 0 20px #00E5FF;
+            --card-shadow: 0 15px 35px -15px rgba(0,0,0,0.5);
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, var(--bg-gradient-1), var(--bg-gradient-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            position: relative;
+            overflow-x: hidden;
+            animation: gradientMove 15s ease infinite;
+            background-size: 400% 400%;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating particles */
+        .particle {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            opacity: 0.2;
+            pointer-events: none;
+            animation: floatParticle 15s infinite linear;
+        }
+
+        @keyframes floatParticle {
+            0% { transform: translateY(-100vh) translateX(0); opacity: 0; }
+            50% { opacity: 0.3; }
+            100% { transform: translateY(100vh) translateX(50px); opacity: 0; }
+        }
+
+        /* Main container */
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 3rem;
+            padding: 2.5rem;
+            box-shadow: 0 30px 60px -15px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 10;
+            border: 1px solid rgba(255,255,255,0.1);
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .title {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            animation: titleGlow 3s infinite;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { filter: drop-shadow(0 0 10px var(--accent-color)); }
+            50% { filter: drop-shadow(0 0 20px var(--accent-color)); }
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            letter-spacing: 2px;
+        }
+
+        /* Input Section */
+        .input-section {
+            background: var(--card-bg);
+            border-radius: 2.5rem;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .input-icon {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 2px solid transparent;
+            color: var(--text-primary);
+            padding: 1rem 1.5rem;
+            border-radius: 2rem;
+            font-size: 1rem;
+            transition: all var(--transition-speed) ease;
+            cursor: pointer;
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: var(--shadow-neon);
+        }
+
+        .input-wrapper input::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            opacity: 0.5;
+            cursor: pointer;
+        }
+
+        .input-wrapper input::-webkit-calendar-picker-indicator:hover {
+            opacity: 1;
+        }
+
+        /* Button Group */
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid transparent;
+            color: var(--text-primary);
+            padding: 1rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: var(--bg-gradient-1);
+            border-color: var(--accent-color);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-neon);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        /* Age Grid */
+        .age-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .age-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 2rem;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all var(--transition-speed) ease;
+            animation: cardFadeIn 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .age-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: var(--accent-color);
+            box-shadow: var(--shadow-neon);
+        }
+
+        .age-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .age-card:hover::before {
+            opacity: 1;
+        }
+
+        @keyframes cardFadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .age-label {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .age-value {
+            color: var(--text-primary);
+            font-size: 2.2rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 0.3rem;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: numberPop 0.5s ease;
+        }
+
+        @keyframes numberPop {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .age-unit {
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+
+        /* Live Seconds Special Card */
+        .seconds-card {
+            grid-column: span 2;
+            background: linear-gradient(135deg, var(--accent-color), #00b8ff);
+        }
+
+        .seconds-card .age-value {
+            color: var(--bg-gradient-1);
+            -webkit-text-fill-color: initial;
+            font-size: 3rem;
+        }
+
+        .seconds-card .age-label,
+        .seconds-card .age-unit {
+            color: var(--bg-gradient-1);
+        }
+
+        /* Error Message */
+        .error-message {
+            color: var(--error-color);
+            text-align: center;
+            padding: 1rem;
+            margin: 1rem 0;
+            background: rgba(255, 77, 77, 0.1);
+            border-radius: 2rem;
+            border: 1px solid var(--error-color);
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-top: 2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container { padding: 1.5rem; }
+            .title { font-size: 2rem; }
+            .age-grid { grid-template-columns: repeat(2, 1fr); }
+            .seconds-card { grid-column: span 2; }
+            .seconds-card .age-value { font-size: 2rem; }
+        }
+
+        @media (max-width: 480px) {
+            .button-group { flex-direction: column; }
+            .age-value { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particles -->
+    <div id="particles"></div>
+
+    <div class="container">
+        <div class="header">
+            <div class="title">AGE CALCULATOR</div>
+            <div class="subtitle">KNOW YOUR EXACT AGE</div>
+        </div>
+
+        <!-- Input Section -->
+        <div class="input-section">
+            <div class="input-group">
+                <div class="input-label">
+                    <span class="input-icon">📅</span>
+                    Date of Birth
+                </div>
+                <div class="input-wrapper">
+                    <input type="date" id="dobInput" max="">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-label">
+                    <span class="input-icon">⏰</span>
+                    Time of Birth (Optional)
+                </div>
+                <div class="input-wrapper">
+                    <input type="time" id="timeInput" value="00:00">
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="calculateAge()">
+                    <span>🔍</span> Calculate Age
+                </button>
+                <button class="btn btn-secondary" onclick="resetCalculator()">
+                    <span>🔄</span> Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- Age Grid -->
+        <div id="ageGrid" class="age-grid" style="display: none;">
+            <!-- Years Card -->
+            <div class="age-card">
+                <div class="age-label">Years</div>
+                <div class="age-value" id="years">0</div>
+                <div class="age-unit">YEARS</div>
+            </div>
+
+            <!-- Months Card -->
+            <div class="age-card">
+                <div class="age-label">Months</div>
+                <div class="age-value" id="months">0</div>
+                <div class="age-unit">MONTHS</div>
+            </div>
+
+            <!-- Weeks Card -->
+            <div class="age-card">
+                <div class="age-label">Weeks</div>
+                <div class="age-value" id="weeks">0</div>
+                <div class="age-unit">WEEKS</div>
+            </div>
+
+            <!-- Days Card -->
+            <div class="age-card">
+                <div class="age-label">Days</div>
+                <div class="age-value" id="days">0</div>
+                <div class="age-unit">DAYS</div>
+            </div>
+
+            <!-- Hours Card -->
+            <div class="age-card">
+                <div class="age-label">Hours</div>
+                <div class="age-value" id="hours">0</div>
+                <div class="age-unit">HOURS</div>
+            </div>
+
+            <!-- Minutes Card -->
+            <div class="age-card">
+                <div class="age-label">Minutes</div>
+                <div class="age-value" id="minutes">0</div>
+                <div class="age-unit">MINUTES</div>
+            </div>
+
+            <!-- Seconds Card (Special) -->
+            <div class="age-card seconds-card">
+                <div class="age-label">Seconds</div>
+                <div class="age-value" id="seconds">0</div>
+                <div class="age-unit">SECONDS • LIVE</div>
+            </div>
+        </div>
+
+        <!-- Error Display -->
+        <div id="errorDisplay" style="display: none;"></div>
+
+        <div class="footer">
+            ⚡ Live updating every second • Accurate age calculation
+        </div>
+    </div>
+
+    <script>
+        // ========== GLOBAL VARIABLES ==========
+        let birthDate = null;
+        let timerInterval = null;
+        let currentAge = null;
+
+        // DOM Elements
+        const dobInput = document.getElementById('dobInput');
+        const timeInput = document.getElementById('timeInput');
+        const ageGrid = document.getElementById('ageGrid');
+        const errorDisplay = document.getElementById('errorDisplay');
+        
+        // Age display elements
+        const yearsEl = document.getElementById('years');
+        const monthsEl = document.getElementById('months');
+        const weeksEl = document.getElementById('weeks');
+        const daysEl = document.getElementById('days');
+        const hoursEl = document.getElementById('hours');
+        const minutesEl = document.getElementById('minutes');
+        const secondsEl = document.getElementById('seconds');
+
+        // Set max date to today
+        const today = new Date().toISOString().split('T')[0];
+        dobInput.setAttribute('max', today);
+
+        // Particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 10 + 's';
+                particle.style.animationDuration = 10 + Math.random() * 20 + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+        createParticles();
+
+        // ========== AGE CALCULATION ==========
+        function calculateAge() {
+            // Clear previous interval
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+
+            // Get and validate date
+            const dob = dobInput.value;
+            if (!dob) {
+                showError('Please select your date of birth');
+                return;
+            }
+
+            // Create birth date object
+            const time = timeInput.value || '00:00';
+            const [hours, minutes] = time.split(':');
+            birthDate = new Date(dob);
+            birthDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
+            // Validate date
+            if (!validateDate(birthDate)) {
+                return;
+            }
+
+            // Hide any previous errors
+            hideError();
+
+            // Show age grid with animation
+            ageGrid.style.display = 'grid';
+            
+            // Calculate and display age
+            updateAge();
+            
+            // Start live seconds update
+            startLiveUpdate();
+        }
+
+        function validateDate(date) {
+            const now = new Date();
+            
+            if (date > now) {
+                showError('Birth date cannot be in the future');
+                return false;
+            }
+            
+            if (date.getFullYear() < 1900) {
+                showError('Please enter a valid date (year must be after 1900)');
+                return false;
+            }
+            
+            return true;
+        }
+
+        function updateAge() {
+            if (!birthDate) return;
+            
+            const now = new Date();
+            const diff = now - birthDate;
+            
+            // Calculate different units
+            const seconds = Math.floor(diff / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            const weeks = Math.floor(days / 7);
+            
+            // Months (approximate)
+            const months = (now.getFullYear() - birthDate.getFullYear()) * 12 + 
+                          (now.getMonth() - birthDate.getMonth());
+            
+            // Years (considering leap years)
+            let years = now.getFullYear() - birthDate.getFullYear();
+            if (now.getMonth() < birthDate.getMonth() || 
+                (now.getMonth() === birthDate.getMonth() && now.getDate() < birthDate.getDate())) {
+                years--;
+            }
+            
+            // Adjust months for display
+            const displayMonths = months % 12;
+            
+            // Update display with animation
+            animateNumber(yearsEl, years);
+            animateNumber(monthsEl, displayMonths);
+            animateNumber(weeksEl, weeks);
+            animateNumber(daysEl, days);
+            animateNumber(hoursEl, hours);
+            animateNumber(minutesEl, minutes);
+            animateNumber(secondsEl, seconds);
+        }
+
+        function animateNumber(element, value) {
+            element.style.animation = 'none';
+            element.offsetHeight; // Trigger reflow
+            element.style.animation = 'numberPop 0.5s ease';
+            element.textContent = formatNumber(value);
+        }
+
+        function formatNumber(num) {
+            return num.toLocaleString();
+        }
+
+        // ========== LIVE SECONDS UPDATE ==========
+        function startLiveUpdate() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            timerInterval = setInterval(() => {
+                if (birthDate) {
+                    const now = new Date();
+                    const diff = now - birthDate;
+                    const seconds = Math.floor(diff / 1000);
+                    
+                    // Update only seconds with animation
+                    secondsEl.style.animation = 'none';
+                    secondsEl.offsetHeight;
+                    secondsEl.style.animation = 'numberPop 0.5s ease';
+                    secondsEl.textContent = formatNumber(seconds);
+                    
+                    // Update minutes and hours every 60 seconds
+                    if (seconds % 60 === 0) {
+                        const minutes = Math.floor(seconds / 60);
+                        animateNumber(minutesEl, minutes);
+                        
+                        if (minutes % 60 === 0) {
+                            const hours = Math.floor(minutes / 60);
+                            animateNumber(hoursEl, hours);
+                            
+                            if (hours % 24 === 0) {
+                                const days = Math.floor(hours / 24);
+                                animateNumber(daysEl, days);
+                                
+                                if (days % 7 === 0) {
+                                    const weeks = Math.floor(days / 7);
+                                    animateNumber(weeksEl, weeks);
+                                }
+                            }
+                        }
+                    }
+                }
+            }, 1000);
+        }
+
+        // ========== RESET FUNCTION ==========
+        function resetCalculator() {
+            // Clear interval
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
+            // Reset inputs
+            dobInput.value = '';
+            timeInput.value = '00:00';
+            
+            // Hide age grid
+            ageGrid.style.display = 'none';
+            
+            // Hide errors
+            hideError();
+            
+            // Reset birth date
+            birthDate = null;
+            
+            // Add reset animation
+            document.querySelector('.container').style.animation = 'none';
+            document.querySelector('.container').offsetHeight;
+            document.querySelector('.container').style.animation = 'slideUp 0.6s ease';
+        }
+
+        // ========== ERROR HANDLING ==========
+        function showError(message) {
+            errorDisplay.style.display = 'block';
+            errorDisplay.className = 'error-message';
+            errorDisplay.textContent = `⚠️ ${message}`;
+            
+            // Hide age grid
+            ageGrid.style.display = 'none';
+        }
+
+        function hideError() {
+            errorDisplay.style.display = 'none';
+        }
+
+        // ========== ENTER KEY SUPPORT ==========
+        dobInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                calculateAge();
+            }
+        });
+
+        timeInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                calculateAge();
+            }
+        });
+
+        // Initialize
+        window.addEventListener('load', () => {
+            // Any initialization if needed
+        });
+    </script>
+</body>
+</html>

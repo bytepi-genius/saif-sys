@@ -1,0 +1,208 @@
+/* ========================================
+   CORPORATEWALE - Responsive Design
+   ======================================== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+    .app {
+        max-width: 95%;
+        padding: 0.6rem 1.2rem 3rem;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .app {
+        max-width: 100%;
+        padding: 0.5rem 0.8rem 3.5rem;
+    }
+
+    .header {
+        flex-wrap: wrap;
+    }
+
+    .nav {
+        display: none;
+        width: 100%;
+        flex-direction: column;
+        gap: 0.4rem;
+        padding: 0.5rem 0;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .nav.open {
+        display: flex;
+    }
+
+    .hamburger {
+        display: block;
+    }
+
+    .hero-section {
+        margin: 0.3rem 0 0.5rem;
+        min-height: auto;
+    }
+
+    .hero-title {
+        font-size: clamp(2rem, 6vw, 2.8rem);
+    }
+
+    .hero-sub {
+        font-size: 0.9rem;
+    }
+
+    .hero-btn {
+        padding: 0.4rem 1.4rem;
+        font-size: 0.8rem;
+    }
+
+    .player-area {
+        grid-template-columns: 1fr;
+        gap: 0.6rem;
+        margin: 0.2rem 0 0.6rem;
+    }
+
+    .now-playing-card {
+        padding: 0.8rem 1rem;
+    }
+
+    .np-title {
+        font-size: 1.2rem;
+    }
+
+    .np-artist {
+        font-size: 0.8rem;
+    }
+
+    .np-description {
+        font-size: 0.65rem;
+    }
+
+    .player-controls {
+        padding: 0.8rem;
+    }
+
+    .control-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+    }
+
+    .play-btn {
+        width: 42px;
+        height: 42px;
+        font-size: 1rem;
+    }
+
+    .top-status {
+        font-size: 0.65rem;
+        padding: 0.3rem 0.8rem;
+    }
+
+    .volume-wrap input[type="range"] {
+        width: 60px;
+    }
+
+    .bg-toggle-btn {
+        padding: 0.3rem 1.2rem;
+        font-size: 0.7rem;
+    }
+
+    .motivation-box {
+        padding: 0.5rem 1rem;
+    }
+
+    .motivation-quote {
+        font-size: 0.8rem;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.4rem;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 0.2rem;
+    }
+
+    .mini-player {
+        min-width: 200px;
+        padding: 6px 12px;
+        bottom: 12px;
+    }
+    .mini-title {
+        font-size: 0.75rem;
+    }
+    .mini-artist {
+        font-size: 0.6rem;
+    }
+    .mini-play-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 0.7rem;
+    }
+    .mini-close-btn {
+        width: 24px;
+        height: 24px;
+        font-size: 0.6rem;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 400px) {
+    .app {
+        padding: 0.3rem 0.4rem 2.5rem;
+    }
+
+    .logo {
+        font-size: 1rem;
+    }
+
+    .hero-title {
+        font-size: 1.6rem;
+    }
+
+    .hero-sub {
+        font-size: 0.75rem;
+    }
+
+    .hero-btn {
+        padding: 0.3rem 1rem;
+        font-size: 0.7rem;
+    }
+
+    .np-title {
+        font-size: 1rem;
+    }
+
+    .np-artist {
+        font-size: 0.7rem;
+    }
+
+    .control-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 0.7rem;
+    }
+
+    .play-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 0.85rem;
+    }
+
+    .top-status {
+        font-size: 0.55rem;
+        padding: 0.2rem 0.5rem;
+    }
+
+    .volume-wrap input[type="range"] {
+        width: 45px;
+    }
+
+    .motivation-quote {
+        font-size: 0.7rem;
+    }
+}

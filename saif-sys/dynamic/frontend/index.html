@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image to PDF Converter Pro</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- SortableJS -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="dark-theme">
+    <div class="background-effects">
+        <div class="blob shape-1"></div>
+        <div class="blob shape-2"></div>
+        <div class="blob shape-3"></div>
+    </div>
+
+    <!-- Header Section -->
+    <header class="header">
+        <div class="logo-container">
+            <img src="assets/logo.jpg" alt="Logo" class="logo">
+            <div class="brand">
+                <h1>Converter Pro</h1>
+                <span class="version-badge">v1.2.0</span>
+            </div>
+        </div>
+        <div class="theme-toggle" id="theme-toggle">
+            <span class="toggle-icon sun">☀️</span>
+            <span class="toggle-icon moon">🌙</span>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Hero area -->
+        <section class="hero">
+            <h2 class="animate-up">Seamlessly Convert & Merge</h2>
+            <p class="subtitle animate-up">Powerful, responsive, and blazing fast PDF utilities in your browser.</p>
+        </section>
+
+        <!-- Feature Tabs -->
+        <section class="tabs-container animate-up">
+            <button class="tab-btn active" data-tab="single-image">
+                <span class="icon">📄</span> Single Image
+            </button>
+            <button class="tab-btn" data-tab="multi-image">
+                <span class="icon">🖼️</span> Multi Images
+            </button>
+            <button class="tab-btn" data-tab="merge-pdf">
+                <span class="icon">📚</span> Merge PDFs
+            </button>
+        </section>
+
+        <!-- Tool / Upload Area -->
+        <section class="tool-section glass-card animate-up">
+            <div id="drop-zone" class="drop-zone">
+                <div class="drop-content">
+                    <span class="upload-icon">📁</span>
+                    <h3 id="drop-title">Drag & Drop an image here</h3>
+                    <p id="drop-subtitle">or click to browse (JPG, PNG, WEBP)</p>
+                    <input type="file" id="file-input" multiple hidden>
+                    <button class="browse-btn mt-1">Browse Files</button>
+                </div>
+            </div>
+
+            <!-- Preview Area -->
+            <div class="preview-area hidden" id="preview-area">
+                <div class="list-header-group">
+                    <h4><span id="file-count">0</span> File(s) Selected:</h4>
+                    <div class="list-controls">
+                        <button class="icon-btn" id="undo-btn" title="Undo" disabled>↩️</button>
+                        <button class="icon-btn" id="redo-btn" title="Redo" disabled>↪️</button>
+                        <button class="secondary-btn small-btn" id="auto-arrange-btn">Smart Arrange</button>
+                    </div>
+                </div>
+                <div class="file-list" id="file-list"></div>
+                
+                <!-- Advanced Options -->
+                <div class="options-container" id="options-container">
+                    <h5>Advanced Processing</h5>
+                    <div class="options-grid">
+                        <div class="option-group">
+                            <label class="toggle-label"><input type="checkbox" id="bg-replace-check"> Fix Background</label>
+                            <input type="color" id="bg-color-picker" value="#ffffff" disabled>
+                        </div>
+                        <div class="option-group">
+                            <label>Border (Size & Color)</label>
+                            <div class="inline-inputs">
+                                <input type="number" id="border-size" placeholder="px" min="0" value="0" class="input-light">
+                                <input type="color" id="border-color" value="#000000">
+                            </div>
+                        </div>
+                        <div class="option-group">
+                            <label>Crop (x, y, w, h)</label>
+                            <div class="inline-inputs">
+                                <input type="number" id="crop-x" placeholder="x" min="0" class="input-light">
+                                <input type="number" id="crop-y" placeholder="y" min="0" class="input-light">
+                                <input type="number" id="crop-w" placeholder="w" min="1" class="input-light">
+                                <input type="number" id="crop-h" placeholder="h" min="1" class="input-light">
+                            </div>
+                        </div>
+                        <div class="option-group">
+                            <label>Watermark Text & Pos</label>
+                            <input type="text" id="watermark-text" placeholder="Your Text" class="input-light watermark-input">
+                            <div class="inline-inputs mt-half">
+                                <select id="watermark-pos" class="select-light">
+                                    <option value="center">Center</option>
+                                    <option value="top-left">Top-Left</option>
+                                    <option value="bottom-right">Bottom-Right</option>
+                                </select>
+                                <input type="range" id="watermark-opacity" min="0" max="255" value="128" title="Opacity">
+                            </div>
+                        </div>
+                        <div class="option-group">
+                            <label>Quality & Size Control</label>
+                            <select id="compression-level" class="select-light">
+                                <option value="none">Original (No compress)</option>
+                                <option value="high">High Quality (Low compress)</option>
+                                <option value="medium">Medium (Balanced)</option>
+                                <option value="low">Low Quality (Max compress)</option>
+                            </select>
+                        </div>
+                        <div class="option-group">
+                            <label>Visual Filters</label>
+                            <select id="filter-type" class="select-light">
+                                <option value="none">None</option>
+                                <option value="grayscale">Grayscale</option>
+                                <option value="bw">Black & White</option>
+                                <option value="contrast">Enhance Contrast</option>
+                            </select>
+                        </div>
+                        <div class="option-group">
+                            <label>Page Settings (PDF)</label>
+                            <div class="inline-inputs mb-half">
+                                <select id="page-size" class="select-light">
+                                    <option value="auto">Auto (Match Image)</option>
+                                    <option value="a4">A4 (2480x3508)</option>
+                                    <option value="a3">A3 (3508x4960)</option>
+                                    <option value="letter">Letter</option>
+                                </select>
+                                <select id="page-orientation" class="select-light">
+                                    <option value="portrait">Portrait</option>
+                                    <option value="landscape">Landscape</option>
+                                </select>
+                            </div>
+                            <div class="inline-inputs">
+                                <select id="page-align" class="select-light">
+                                    <option value="center">Center</option>
+                                    <option value="top">Top</option>
+                                    <option value="bottom">Bottom</option>
+                                </select>
+                                <input type="number" id="page-margin" placeholder="Margin px" min="0" value="0" class="input-light">
+                            </div>
+                        </div>
+                        <div class="option-group">
+                            <label class="toggle-label"><input type="checkbox" id="page-num-check"> Add Page Numbers</label>
+                            <select id="page-num-pos" class="select-light mt-half" disabled>
+                                <option value="bottom-center">Bottom Center</option>
+                                <option value="top-right">Top Right</option>
+                                <option value="bottom-right">Bottom Right</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="secondary-btn full-width mt-1" id="smart-optimize-btn">✨ One Click Optimize</button>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="primary-btn pulse" id="process-btn">Generate PDF</button>
+                    <button class="secondary-btn pulse-alt" id="preview-pdf-btn">Preview PDF</button>
+                    <button class="secondary-btn" id="clear-btn">Clear All</button>
+                </div>
+            </div>
+            
+            <div id="download-history" class="download-history hidden">
+                <h5>Recent Downloads:</h5>
+                <ul id="history-list"></ul>
+            </div>
+
+            <!-- Progress Overlay -->
+            <div class="progress-overlay hidden" id="progress-overlay">
+                <div class="spinner"></div>
+                <p>Processing your files...</p>
+            </div>
+        </section>
+
+        <!-- Future Scope -->
+        <section class="future-scope glass-card animate-up">
+            <h3>🚀 Future Scope</h3>
+            <div class="scope-grid">
+                <div class="scope-item">
+                    <span class="icon">🤖</span>
+                    <h4>AI Image Analyzer</h4>
+                    <span class="badge">Coming Soon</span>
+                </div>
+                <div class="scope-item">
+                    <span class="icon">📝</span>
+                    <h4>Resume Builder</h4>
+                    <span class="badge">Coming Soon</span>
+                </div>
+                <div class="scope-item">
+                    <span class="icon">🔍</span>
+                    <h4>OCR Text Extractor</h4>
+                    <span class="badge">Coming Soon</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Developed by <a href="https://saif-sys.netlify.app/" target="_blank" rel="noopener noreferrer">Saif Ali</a></p>
+    </footer>
+
+    <!-- Custom Modal for Multi-Image -->
+    <div class="modal hidden" id="action-modal">
+        <div class="modal-content glass-card">
+            <h3>How would you like your PDFs?</h3>
+            <p>You uploaded multiple images. Select an action below:</p>
+            <div class="modal-actions">
+                <button class="modal-btn merge-btn" data-action="merge">
+                    <span class="icon">📑</span> Merge into one PDF
+                </button>
+                <button class="modal-btn zip-btn" data-action="zip">
+                    <span class="icon">🗂️</span> Download Separately (ZIP)
+                </button>
+            </div>
+            <button class="close-btn" id="modal-close">&times;</button>
+        </div>
+    </div>
+
+    <!-- Universal Modal Base -->
+    <div class="modal hidden" id="universal-modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3 id="univ-modal-title">Preview</h3>
+                <button class="close-btn" id="univ-modal-close">&times;</button>
+            </div>
+            <div id="univ-modal-body" class="modal-body-scroll">
+                <!-- Iframes/Images inject dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

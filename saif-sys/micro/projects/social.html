@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Social Identity Card Studio · Premium Card Generator</title>
+  <!-- Google Fonts + Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- html2canvas for download -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- QR Code library -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(145deg, #f3f5fc, #e8ecf9);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .app-container {
+      max-width: 1400px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(16px);
+      border-radius: 48px;
+      box-shadow: 0 30px 60px -15px #1e293b80, 0 0 0 1px #ffffff50;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 0;
+    }
+
+    /* Left Panel - Form */
+    .form-panel {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      padding: 2.5rem;
+      border-right: 1px solid #ffffff70;
+    }
+
+    .form-panel h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 2rem;
+    }
+
+    .input-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .input-group label {
+      display: block;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    .input-group input, .input-group textarea {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 40px;
+      font-size: 1rem;
+      transition: 0.2s;
+      background: white;
+    }
+
+    .input-group input:focus, .input-group textarea:focus {
+      border-color: #8b5cf6;
+      outline: none;
+      box-shadow: 0 0 0 4px #8b5cf620;
+    }
+
+    .photo-upload {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .photo-preview {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #f1f5f9;
+      border: 3px solid #8b5cf6;
+      object-fit: cover;
+    }
+
+    .color-picker {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .color-picker input {
+      width: 60px;
+      height: 60px;
+      border-radius: 20px;
+      border: 2px solid #e2e8f0;
+      cursor: pointer;
+    }
+
+    /* Right Panel - Preview */
+    .preview-panel {
+      padding: 2.5rem;
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(8px);
+    }
+
+    .template-tabs {
+      display: flex;
+      gap: 0.8rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .template-btn {
+      background: white;
+      border: 2px solid #e2e8f0;
+      padding: 0.8rem 1.5rem;
+      border-radius: 40px;
+      font-weight: 600;
+      color: #475569;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .template-btn.active {
+      background: #8b5cf6;
+      border-color: #8b5cf6;
+      color: white;
+    }
+
+    .card-preview {
+      width: 100%;
+      min-height: 500px;
+      border-radius: 32px;
+      margin-bottom: 2rem;
+      transition: transform 0.3s;
+    }
+
+    .download-btn {
+      background: #3b82f6;
+      border: none;
+      color: white;
+      font-weight: 700;
+      padding: 1.2rem 2rem;
+      border-radius: 60px;
+      font-size: 1.2rem;
+      width: 100%;
+      cursor: pointer;
+      box-shadow: 0 10px 30px #3b82f6;
+      transition: 0.2s;
+    }
+
+    .download-btn:hover {
+      transform: scale(1.02);
+      background: #2563eb;
+    }
+
+    /* Card Templates Styling */
+    .card {
+      width: 100%;
+      aspect-ratio: 1 / 1.2;
+      border-radius: 32px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .card img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid white;
+      margin-bottom: 1rem;
+    }
+
+    .card h3 {
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+
+    .card p {
+      margin: 0.3rem 0;
+      opacity: 0.9;
+    }
+
+    .social-icons {
+      display: flex;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .social-icons i {
+      font-size: 1.8rem;
+      cursor: pointer;
+    }
+
+    .qr-code {
+      margin-top: 1rem;
+      width: 100px;
+      height: 100px;
+      background: white;
+      padding: 0.5rem;
+      border-radius: 20px;
+    }
+
+    /* Template 1: Modern Gradient */
+    .template-1 {
+      background: linear-gradient(145deg, #fccc63, #e4405f, #833ab4);
+      color: white;
+      box-shadow: 0 20px 40px -10px #e4405f;
+    }
+
+    /* Template 2: Dark Neon */
+    .template-2 {
+      background: #0f0f1f;
+      color: white;
+      border: 2px solid #7c3aed;
+      box-shadow: 0 0 30px #7c3aed, 0 0 10px #00f5ff inset;
+    }
+    .template-2 .social-icons i { color: #00f5ff; text-shadow: 0 0 15px #00f5ff; }
+
+    /* Template 3: Minimal Clean Corporate */
+    .template-3 {
+      background: white;
+      color: #1e293b;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 20px 40px -10px #94a3b8;
+    }
+
+    /* Template 4: Glassmorphism */
+    .template-4 {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.5);
+      color: #1e293b;
+    }
+
+    /* Template 5: 3D Tilt (simulated with shadow) */
+    .template-5 {
+      background: linear-gradient(145deg, #f9f9f9, #e0e7ff);
+      color: #1e293b;
+      transform-style: preserve-3d;
+      box-shadow: 0 30px 50px -20px #00000050, 0 0 0 1px #ffffff, 0 20px 30px -15px #8b5cf6;
+    }
+
+    .responsive-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    @media (max-width: 900px) {
+      .app-container { grid-template-columns: 1fr; }
+      body { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Left: Form Panel -->
+    <div class="form-panel">
+      <h2><i class="fas fa-id-card"></i> Identity Studio</h2>
+      
+      <div class="photo-upload">
+        <img src="https://via.placeholder.com/80" alt="preview" class="photo-preview" id="photoPreview">
+        <div>
+          <label for="photoInput" class="btn" style="background:#8b5cf6; color:white; padding:0.8rem 2rem; border-radius:40px; cursor:pointer;">Upload Photo</label>
+          <input type="file" id="photoInput" accept="image/*" style="display:none;">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Full Name</label>
+        <input type="text" id="fullName" placeholder="Alex Johnson" value="Alex Johnson">
+      </div>
+
+      <div class="input-group">
+        <label>Username</label>
+        <input type="text" id="username" placeholder="@alexj" value="@alexj">
+      </div>
+
+      <div class="input-group">
+        <label>Bio</label>
+        <textarea id="bio" rows="2">Digital creator · Travel · Tech</textarea>
+      </div>
+
+      <div class="input-group">
+        <label>Email</label>
+        <input type="email" id="email" value="alex@example.com">
+      </div>
+
+      <div class="input-group">
+        <label>Phone</label>
+        <input type="text" id="phone" value="+1 234 567 890">
+      </div>
+
+      <div class="input-group">
+        <label>Location</label>
+        <input type="text" id="location" value="San Francisco, CA">
+      </div>
+
+      <div class="input-group">
+        <label>Website</label>
+        <input type="text" id="website" value="alexj.design">
+      </div>
+
+      <div class="input-group">
+        <label>Social Links (comma separated)</label>
+        <input type="text" id="socialLinks" value="twitter, instagram, github">
+      </div>
+
+      <div class="color-picker">
+        <label>Accent Color</label>
+        <input type="color" id="accentColor" value="#8b5cf6">
+      </div>
+    </div>
+
+    <!-- Right: Preview Panel -->
+    <div class="preview-panel">
+      <div class="template-tabs" id="templateTabs">
+        <button class="template-btn active" data-template="1">Gradient</button>
+        <button class="template-btn" data-template="2">Dark Neon</button>
+        <button class="template-btn" data-template="3">Corporate</button>
+        <button class="template-btn" data-template="4">Glassmorphism</button>
+        <button class="template-btn" data-template="5">3D Tilt</button>
+      </div>
+
+      <!-- Live Card Preview -->
+      <div class="card-preview" id="cardPreviewContainer">
+        <div class="card template-1" id="liveCard">
+          <img src="https://via.placeholder.com/120" alt="profile" id="cardPhoto">
+          <h3 id="cardName">Alex Johnson</h3>
+          <p id="cardUsername">@alexj</p>
+          <p id="cardBio">Digital creator · Travel · Tech</p>
+          <p><i class="fas fa-map-marker-alt"></i> <span id="cardLocation">San Francisco, CA</span></p>
+          <p><i class="fas fa-envelope"></i> <span id="cardEmail">alex@example.com</span></p>
+          <p><i class="fas fa-phone"></i> <span id="cardPhone">+1 234 567 890</span></p>
+          <p><i class="fas fa-globe"></i> <span id="cardWebsite">alexj.design</span></p>
+          <div class="social-icons" id="cardSocials">
+            <i class="fab fa-twitter"></i>
+            <i class="fab fa-instagram"></i>
+            <i class="fab fa-github"></i>
+          </div>
+          <div class="qr-code" id="qrCode"></div>
+        </div>
+      </div>
+
+      <button class="download-btn" id="downloadBtn"><i class="fas fa-download"></i> Download as PNG</button>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // DOM elements
+      const photoInput = document.getElementById('photoInput');
+      const photoPreview = document.getElementById('photoPreview');
+      const cardPhoto = document.getElementById('cardPhoto');
+      
+      const fullName = document.getElementById('fullName');
+      const username = document.getElementById('username');
+      const bio = document.getElementById('bio');
+      const email = document.getElementById('email');
+      const phone = document.getElementById('phone');
+      const location = document.getElementById('location');
+      const website = document.getElementById('website');
+      const socialLinks = document.getElementById('socialLinks');
+      const accentColor = document.getElementById('accentColor');
+
+      const cardName = document.getElementById('cardName');
+      const cardUsername = document.getElementById('cardUsername');
+      const cardBio = document.getElementById('cardBio');
+      const cardEmail = document.getElementById('cardEmail');
+      const cardPhone = document.getElementById('cardPhone');
+      const cardLocation = document.getElementById('cardLocation');
+      const cardWebsite = document.getElementById('cardWebsite');
+      const cardSocials = document.getElementById('cardSocials');
+      const liveCard = document.getElementById('liveCard');
+      const templateBtns = document.querySelectorAll('.template-btn');
+
+      let currentTemplate = 1;
+
+      // --- Update live preview from form ---
+      function updatePreview() {
+        cardName.innerText = fullName.value || 'Alex Johnson';
+        cardUsername.innerText = username.value || '@alexj';
+        cardBio.innerText = bio.value || 'Digital creator';
+        cardEmail.innerText = email.value || 'alex@example.com';
+        cardPhone.innerText = phone.value || '+1 234 567 890';
+        cardLocation.innerText = location.value || 'San Francisco, CA';
+        cardWebsite.innerText = website.value || 'alexj.design';
+
+        // social icons
+        const links = socialLinks.value.split(',').map(s => s.trim());
+        let iconsHtml = '';
+        links.forEach(link => {
+          if (link.toLowerCase().includes('twitter')) iconsHtml += '<i class="fab fa-twitter"></i>';
+          else if (link.toLowerCase().includes('instagram')) iconsHtml += '<i class="fab fa-instagram"></i>';
+          else if (link.toLowerCase().includes('github')) iconsHtml += '<i class="fab fa-github"></i>';
+          else if (link.toLowerCase().includes('linkedin')) iconsHtml += '<i class="fab fa-linkedin"></i>';
+          else if (link) iconsHtml += `<i class="fas fa-link"></i>`;
+        });
+        cardSocials.innerHTML = iconsHtml || '<i class="fab fa-twitter"></i><i class="fab fa-instagram"></i>';
+
+        // QR code generation (simple)
+        const qrContainer = document.getElementById('qrCode');
+        qrContainer.innerHTML = '';
+        const qrData = `https://instagram.com/${username.value.replace('@','')}`;
+        QRCode.toCanvas(document.createElement('canvas'), qrData, { width: 100 }, (err, canvas) => {
+          if (err) return;
+          qrContainer.innerHTML = '';
+          qrContainer.appendChild(canvas);
+        });
+      }
+
+      // --- Photo upload ---
+      photoInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            photoPreview.src = e.target.result;
+            cardPhoto.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // --- Template switching ---
+      templateBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          templateBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentTemplate = parseInt(btn.dataset.template);
+          
+          // remove all template classes
+          liveCard.className = 'card';
+          liveCard.classList.add(`template-${currentTemplate}`);
+          
+          // apply accent color (simplified)
+          if (currentTemplate === 2) {
+            liveCard.style.borderColor = accentColor.value;
+          }
+        });
+      });
+
+      // --- Real-time input listeners ---
+      [fullName, username, bio, email, phone, location, website, socialLinks].forEach(input => {
+        input.addEventListener('input', updatePreview);
+      });
+
+      accentColor.addEventListener('input', (e) => {
+        if (currentTemplate === 2) {
+          liveCard.style.borderColor = e.target.value;
+        }
+      });
+
+      // --- Download PNG using html2canvas ---
+      document.getElementById('downloadBtn').addEventListener('click', () => {
+        const card = document.getElementById('liveCard');
+        html2canvas(card, { scale: 2, backgroundColor: null }).then(canvas => {
+          const link = document.createElement('a');
+          link.download = 'profile-card.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+        });
+      });
+
+      // Initial preview
+      updatePreview();
+
+      // Auto-generate QR on load
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+{
+  "songs": [
+    {
+      "id": 1,
+      "title": "Chal Tere Ishq Mein",
+      "artist": "Arijit Singh",
+      "file": "audio/Chal Tere Ishq Mein - arijit SIngh.mp3",
+      "description": "A calm and soothing song for relaxing during a busy corporate day."
+    },
+    {
+      "id": 2,
+      "title": "Channa Mereya",
+      "artist": "Arijit Singh",
+      "file": "audio/Channa Mereya - arijit singh.mp3",
+      "description": "A peaceful track for late evening work and quiet moments."
+    },
+    {
+      "id": 3,
+      "title": "Gehra Hua",
+      "artist": "Arijit Singh",
+      "file": "audio/Gehra Hua - Arijit Singh.mp3",
+      "description": "A refreshing song to create a positive atmosphere while working."
+    },
+    {
+      "id": 4,
+      "title": "Kalank",
+      "artist": "Arijit Singh",
+      "file": "audio/Kalank - Arijit Singh Pritam Amitabh.mp3",
+      "description": "A nostalgic track for those long corporate hours."
+    },
+    {
+      "id": 5,
+      "title": "Saiyaara",
+      "artist": "Arijit Singh",
+      "file": "audio/Dhun Song Saiyaara - Arijit Singh.mp3 ",
+      "description": "A thoughtful song for quiet moments and late-night work."
+    },
+    {
+      "id": 6,
+      "title": "Lut Gaye",
+      "artist": "Jubin Nautiyal",
+      "file": "audio/Lut Gaye-jubin.mp3",
+      "description": "A soulful romantic track for late-night work sessions."
+    },
+    {
+      "id": 7,
+      "title": "Tum Hi Aana",
+      "artist": "Jubin Nautiyal",
+      "file": "audio/Tum hi ana-Jubin.mp3",
+      "description": "An emotional song for those quiet corporate moments."
+    },
+    {
+      "id": 8,
+      "title": "Raataan Lambiyan",
+      "artist": "Jubin Nautiyal",
+      "file": "audio/Raataan Lambiya - Jubin.mp3",
+      "description": "A relaxing track for evening work sessions."
+    },
+    {
+      "id": 9,
+      "title": "Barbaad",
+      "artist": "Jubin Nautiyal",
+      "file": "audio/Barbaad-Jubin Nautiyal.mp3",
+      "description": "A soulful melody for creative work sessions."
+    },
+    {
+      "id": 10,
+      "title": "Tujhe Kitna Chahein Aur",
+      "artist": "Jubin Nautiyal",
+      "file": "audio/Tujhe Kitna Chahein Aur-jubin.mp3",
+      "description": "A romantic track for peaceful work environment."
+    },
+    {
+      "id": 11,
+      "title": "Meherbani",
+      "artist": "Jubin Nautiyal",
+      "file": "audio/MEHERBANI-Jubin.mp3",
+      "description": "A calm and peaceful track for relaxed work."
+    },
+    {
+      "id": 12,
+      "title": "Dil Galti Kar Baitha Hai",
+      "artist": "Jubin Nautiyal",
+      "file": "audio/Dil Galti Kar Baitha Hai-Jubin.mp3",
+      "description": "A nostalgic song for long office hours."
+    },
+    {
+      "id": 13,
+      "title": "Humnava Mere",
+      "artist": "Jubin Nautiyal",
+      "file": "audio/Humnava Mere-Jubin.mp3",
+      "description": "A soothing melody for focused work hours."
+    },
+    {
+      "id": 14,
+      "title": "Saath Hum Rahein",
+      "artist": "Jubin Nautiyal",
+      "file": "audio/Saath Hum rahein-Jubin.mp3",
+      "description": "A refreshing song for positive work atmosphere."
+    },
+    {
+      "id": 15,
+      "title": "Meri Aashiqui",
+      "artist": "Jubin Nautiyal",
+      "file": "audio/Meri Aashiqui Song _ Rochak Kohli Feat-Jubin Nautiyal.mp3",
+      "description": "A romantic track for peaceful work environment."
+    },
+    {
+      "id": 16,
+      "title": "Dhoom Machale",
+      "artist": "Sunidhi Chauhan",
+      "file": "audio/Dhoom Machale-jubin.mp3",
+      "description": "An energetic song to boost your work mood."
+    },
+    {
+      "id": 17,
+      "title": "Crazy Kiya Re",
+      "artist": "Sunidhi Chauhan",
+      "file": "audio/Crazy Kiya Re-sunidhi.mp3",
+      "description": "A fun and upbeat track for creative work."
+    },
+    {
+      "id": 18,
+      "title": "Sheila Ki Jawani",
+      "artist": "Sunidhi Chauhan",
+      "file": "audio/Sheila Ki Jawani-jubin.mp3",
+      "description": "A high-energy track for deadline work."
+    },
+    {
+      "id": 19,
+      "title": "Kesariya",
+      "artist": "Arijit Singh",
+      "file": "audio/Kesariya Brahmāstra- Arijit.mp3",
+      "description": "A romantic track for peaceful work environment."
+    },
+    {
+      "id": 20,
+      "title": "Satranga",
+      "artist": "Arijit Singh",
+      "file": "audio/Satranga.mp3",
+      "description": "A refreshing song for positive work atmosphere."
+    },
+    {
+      "id": 21,
+      "title": "Sajni",
+      "artist": "Arijit Singh",
+      "file": "audio/sajni.mp3",
+      "description": "A calm melody for relaxed work."
+    },
+    {
+      "id": 22,
+      "title": "Apna Bana Le",
+      "artist": "Arijit Singh",
+      "file": "audio/Apna Bana Le-arijit.mp3",
+      "description": "A thoughtful song for quiet work moments."
+    },
+    {
+      "id": 23,
+      "title": "O Maahi",
+      "artist": "Arijit Singh",
+      "file": "audio/O mahi.mp3",
+      "description": "A refreshing song for work playlist."
+    },
+    {
+      "id": 24,
+      "title": "Ae Dil Hai Mushkil",
+      "artist": "Arijit Singh",
+      "file": "audio/Ae Dil Hai Mushkil-arijit.mp3",
+      "description": "A soulful song for creative work sessions."
+    }
+  ]
+}

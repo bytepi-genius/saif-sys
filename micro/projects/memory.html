@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEMORY • CARD GAME</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Theme variables - Default Neon Blue */
+        :root {
+            --bg-gradient-1: #06142E;
+            --bg-gradient-2: #0B2447;
+            --panel-bg: rgba(10, 25, 50, 0.45);
+            --card-back: #0B2447;
+            --card-front: #1a3a5f;
+            --accent-color: #00E5FF;
+            --text-primary: #ffffff;
+            --text-secondary: #b0d4f0;
+            --border-glow: rgba(0, 229, 255, 0.5);
+            --shadow-neon: 0 0 20px #00E5FF;
+            --card-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+        }
+
+        /* Retro Pixel Theme */
+        [data-theme="retro"] {
+            --bg-gradient-1: #1a0b2e;
+            --bg-gradient-2: #2d1b3a;
+            --panel-bg: rgba(45, 27, 58, 0.8);
+            --card-back: #4a2b5a;
+            --card-front: #6b3f7a;
+            --accent-color: #FFD700;
+            --text-primary: #FFE500;
+            --text-secondary: #c0a0ff;
+            --border-glow: rgba(255, 215, 0, 0.5);
+            --shadow-neon: 0 0 20px #FFD700;
+        }
+
+        /* Jungle Green Theme */
+        [data-theme="jungle"] {
+            --bg-gradient-1: #0A2F1F;
+            --bg-gradient-2: #1C4E3D;
+            --panel-bg: rgba(10, 47, 31, 0.7);
+            --card-back: #1C4E3D;
+            --card-front: #2E7D5E;
+            --accent-color: #7CFC00;
+            --text-primary: #e0ffe0;
+            --text-secondary: #90EE90;
+            --border-glow: rgba(124, 252, 0, 0.5);
+            --shadow-neon: 0 0 20px #7CFC00;
+        }
+
+        /* Sunset Orange Theme */
+        [data-theme="sunset"] {
+            --bg-gradient-1: #441E0A;
+            --bg-gradient-2: #7A3E1A;
+            --panel-bg: rgba(68, 30, 10, 0.7);
+            --card-back: #7A3E1A;
+            --card-front: #B85C2A;
+            --accent-color: #FF8C42;
+            --text-primary: #FFE5D0;
+            --text-secondary: #FFB085;
+            --border-glow: rgba(255, 140, 66, 0.5);
+            --shadow-neon: 0 0 20px #FF8C42;
+        }
+
+        /* Minimal Light Theme */
+        [data-theme="light"] {
+            --bg-gradient-1: #E8F0F2;
+            --bg-gradient-2: #B8D8E3;
+            --panel-bg: rgba(255, 255, 255, 0.7);
+            --card-back: #B8D8E3;
+            --card-front: #4A90E2;
+            --accent-color: #3498DB;
+            --text-primary: #2C3E50;
+            --text-secondary: #34495E;
+            --border-glow: rgba(52, 152, 219, 0.5);
+            --shadow-neon: 0 0 20px #3498DB;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, var(--bg-gradient-1), var(--bg-gradient-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            transition: background 0.3s ease;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background particles */
+        .particle {
+            position: fixed;
+            width: 3px;
+            height: 3px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            opacity: 0.2;
+            pointer-events: none;
+            animation: floatParticle 15s infinite linear;
+        }
+
+        @keyframes floatParticle {
+            0% { transform: translateY(-100vh) translateX(0); opacity: 0; }
+            50% { opacity: 0.3; }
+            100% { transform: translateY(100vh) translateX(50px); opacity: 0; }
+        }
+
+        /* Main game container */
+        .game-container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 2.5rem;
+            padding: 2rem;
+            box-shadow: 0 30px 60px -15px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .title {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: var(--shadow-neon);
+            letter-spacing: 3px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            letter-spacing: 4px;
+        }
+
+        /* Theme Selection Screen */
+        .theme-screen {
+            text-align: center;
+        }
+
+        .theme-title {
+            color: var(--text-primary);
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            text-shadow: var(--shadow-neon);
+        }
+
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .theme-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--accent-color);
+            border-radius: 1.5rem;
+            padding: 1.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-neon);
+            background: rgba(255,255,255,0.1);
+        }
+
+        .theme-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            
+        }
+
+        .theme-name {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Difficulty Selector */
+        .difficulty-selector {
+            background: rgba(0,0,0,0.3);
+            border-radius: 3rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .difficulty-title {
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .difficulty-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .difficulty-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--accent-color);
+            color: var(--text-primary);
+            padding: 0.8rem 2rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+        }
+
+        .difficulty-btn:hover,
+        .difficulty-btn.active {
+            background: var(--accent-color);
+            color: var(--bg-gradient-1);
+            box-shadow: var(--shadow-neon);
+            transform: scale(1.05);
+        }
+
+        .start-btn {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid var(--accent-color);
+            color: var(--text-primary);
+            padding: 1rem 3rem;
+            border-radius: 3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-top: 1rem;
+        }
+
+        .start-btn:hover {
+            background: var(--accent-color);
+            color: var(--bg-gradient-1);
+            box-shadow: var(--shadow-neon);
+            transform: scale(1.05);
+        }
+
+        /* Game Screen */
+        .game-screen {
+            display: none;
+        }
+
+        /* Stats Panel */
+        .stats-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1rem 2rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 3rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .stat-value {
+            color: var(--text-primary);
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-shadow: var(--shadow-neon);
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .control-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--accent-color);
+            color: var(--text-primary);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.2s ease;
+        }
+
+        .control-btn:hover {
+            background: var(--accent-color);
+            color: var(--bg-gradient-1);
+            box-shadow: var(--shadow-neon);
+            transform: scale(1.1);
+        }
+
+        /* Game Board */
+        .board-container {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .game-board {
+            display: grid;
+            gap: 0.8rem;
+            justify-content: center;
+            padding: 0.5rem;
+        }
+
+        /* Card Styles */
+        .card {
+            aspect-ratio: 1;
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease;
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card.matched {
+            animation: matchedPulse 0.5s ease;
+        }
+
+        @keyframes matchedPulse {
+            0% { transform: scale(1) rotateY(180deg); }
+            50% { transform: scale(1.1) rotateY(180deg); }
+            100% { transform: scale(1) rotateY(180deg); }
+        }
+
+        .card-front,
+        .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .card-back {
+            background: var(--card-back);
+            transform: rotateY(0deg);
+        }
+
+        .card-back:hover {
+            box-shadow: var(--shadow-neon);
+            border-color: var(--accent-color);
+        }
+
+        .card-back::after {
+            content: "?";
+            color: var(--accent-color);
+            font-size: 2rem;
+            font-weight: 700;
+            opacity: 0.7;
+        }
+
+        .card-front {
+            background: var(--card-front);
+            transform: rotateY(180deg);
+        }
+
+        /* Victory Overlay */
+        .victory-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .victory-card {
+            background: var(--panel-bg);
+            border: 2px solid var(--accent-color);
+            border-radius: 3rem;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: var(--shadow-neon);
+            animation: slideUp 0.5s ease;
+        }
+
+        .victory-title {
+            font-size: 4rem;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            text-shadow: var(--shadow-neon);
+        }
+
+        .victory-stats {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .victory-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .victory-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--accent-color);
+            color: var(--text-primary);
+            padding: 1rem 2rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+        }
+
+        .victory-btn:hover {
+            background: var(--accent-color);
+            color: var(--bg-gradient-1);
+            box-shadow: var(--shadow-neon);
+            transform: scale(1.05);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: var(--accent-color);
+            position: absolute;
+            animation: confetti 3s ease-out forwards;
+        }
+
+        @keyframes confetti {
+            0% { transform: translateY(0) rotate(0); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        .footer {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 600px) {
+            .game-container { padding: 1rem; }
+            .title { font-size: 2rem; }
+            .stats-panel { flex-direction: column; }
+            .card-front, .card-back { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particles Container -->
+    <div id="particles"></div>
+
+    <!-- Confetti Container -->
+    <div id="confetti"></div>
+
+    <!-- Victory Overlay -->
+    <div id="victoryOverlay" class="victory-overlay">
+        <div class="victory-card">
+            <div class="victory-title">🏆 VICTORY!</div>
+            <div class="victory-stats" id="victoryStats"></div>
+            <div class="victory-buttons">
+                <button class="victory-btn" onclick="playAgain()">Play Again</button>
+                <button class="victory-btn" onclick="backToMenu()">Main Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <!-- Theme Selection Screen -->
+        <div id="themeScreen" class="theme-screen">
+            <div class="title">🎴 MEMORY</div>
+            <div class="subtitle">CARD • GAME</div>
+            
+            <div class="theme-title">Choose Theme</div>
+            <div class="theme-grid">
+                <div class="theme-card" onclick="setTheme('neon')">
+                    <div class="theme-icon">🌌</div>
+                    <div class="theme-name">Neon Blue</div>
+                </div>
+                <div class="theme-card" onclick="setTheme('retro')">
+                    <div class="theme-icon">👾</div>
+                    <div class="theme-name">Retro Pixel</div>
+                </div>
+                <div class="theme-card" onclick="setTheme('jungle')">
+                    <div class="theme-icon">🌿</div>
+                    <div class="theme-name">Jungle Green</div>
+                </div>
+                <div class="theme-card" onclick="setTheme('sunset')">
+                    <div class="theme-icon">🌅</div>
+                    <div class="theme-name">Sunset Orange</div>
+                </div>
+                <div class="theme-card" onclick="setTheme('light')">
+                    <div class="theme-icon">☀️</div>
+                    <div class="theme-name">Minimal Light</div>
+                </div>
+            </div>
+
+            <!-- Difficulty Selector -->
+            <div class="difficulty-selector">
+                <div class="difficulty-title">🎯 Select Difficulty</div>
+                <div class="difficulty-buttons">
+                    <button class="difficulty-btn active" onclick="setDifficulty('easy')" id="diffEasy">Easy (4x4)</button>
+                    <button class="difficulty-btn" onclick="setDifficulty('medium')" id="diffMedium">Medium (6x6)</button>
+                    <button class="difficulty-btn" onclick="setDifficulty('hard')" id="diffHard">Hard (8x8)</button>
+                </div>
+            </div>
+            
+            <button class="start-btn" onclick="startGame()">START GAME</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="game-screen">
+            <div class="header">
+                <div class="title">MEMORY</div>
+                <div class="subtitle">MATCH • THE • PAIRS</div>
+            </div>
+
+            <!-- Stats Panel -->
+            <div class="stats-panel">
+                <div class="stat-item">
+                    <div class="stat-label">MOVES</div>
+                    <div class="stat-value" id="moves">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">PAIRS</div>
+                    <div class="stat-value" id="pairs">0/0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">TIME</div>
+                    <div class="stat-value" id="timer">00:00</div>
+                </div>
+                <div class="control-buttons">
+                    <button class="control-btn" onclick="restartGame()" title="Restart">🔄</button>
+                    <button class="control-btn" onclick="backToMenu()" title="Menu">🏠</button>
+                </div>
+            </div>
+
+            <!-- Game Board -->
+            <div class="board-container">
+                <div id="gameBoard" class="game-board"></div>
+            </div>
+
+            <div class="footer">CLICK • MATCH • WIN</div>
+        </div>
+    </div>
+
+    <script>
+        // ========== GLOBAL VARIABLES ==========
+        let currentTheme = 'neon';
+        let currentDifficulty = 'easy';
+        let gridSize = 4;
+        let cards = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let totalPairs = 0;
+        let moves = 0;
+        let gameStarted = false;
+        let gameCompleted = false;
+        let lockBoard = false;
+        let timer = 0;
+        let timerInterval;
+        let bestScore = localStorage.getItem('memoryBestScore') || 0;
+
+        // Card icons for different difficulties
+        const cardIcons = [
+            '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼',
+            '🐨', '🐯', '🦁', '🐮', '🐸', '🐙', '🦷', '🐔',
+            '🐧', '🐦', '🐤', '🐣', '🐥', '🐺', '🐗', '🐴',
+            '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟'
+        ];
+
+        // Particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 10 + 's';
+                particle.style.animationDuration = 10 + Math.random() * 20 + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+        createParticles();
+
+        // ========== THEME SYSTEM ==========
+        function setTheme(theme) {
+            currentTheme = theme;
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+
+        // ========== DIFFICULTY SYSTEM ==========
+        function setDifficulty(difficulty) {
+            currentDifficulty = difficulty;
+            
+            // Update active class
+            document.getElementById('diffEasy').classList.remove('active');
+            document.getElementById('diffMedium').classList.remove('active');
+            document.getElementById('diffHard').classList.remove('active');
+            
+            if (difficulty === 'easy') {
+                gridSize = 4;
+                document.getElementById('diffEasy').classList.add('active');
+            } else if (difficulty === 'medium') {
+                gridSize = 6;
+                document.getElementById('diffMedium').classList.add('active');
+            } else if (difficulty === 'hard') {
+                gridSize = 8;
+                document.getElementById('diffHard').classList.add('active');
+            }
+            
+            totalPairs = (gridSize * gridSize) / 2;
+        }
+
+        // ========== GAME INITIALIZATION ==========
+        function startGame() {
+            document.getElementById('themeScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+            
+            resetGameState();
+            createBoard();
+            startTimer();
+        }
+
+        function resetGameState() {
+            cards = [];
+            flippedCards = [];
+            matchedPairs = 0;
+            moves = 0;
+            gameStarted = true;
+            gameCompleted = false;
+            lockBoard = false;
+            totalPairs = (gridSize * gridSize) / 2;
+            
+            updateMoves();
+            updatePairs();
+            document.getElementById('victoryOverlay').style.display = 'none';
+        }
+
+        function createBoard() {
+            // Create pairs of icons
+            const icons = cardIcons.slice(0, totalPairs);
+            let cardPairs = [...icons, ...icons];
+            
+            // Shuffle cards
+            for (let i = cardPairs.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cardPairs[i], cardPairs[j]] = [cardPairs[j], cardPairs[i]];
+            }
+
+            // Create card objects
+            cards = cardPairs.map((icon, index) => ({
+                id: index,
+                icon: icon,
+                flipped: false,
+                matched: false
+            }));
+
+            // Render board
+            const board = document.getElementById('gameBoard');
+            board.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+            
+            board.innerHTML = cards.map((card, index) => `
+                <div class="card" data-index="${index}" onclick="handleCardClick(${index})">
+                    <div class="card-front">${card.icon}</div>
+                    <div class="card-back"></div>
+                </div>
+            `).join('');
+        }
+
+        // ========== CARD HANDLING ==========
+        function handleCardClick(index) {
+            if (!gameStarted || gameCompleted || lockBoard) return;
+            
+            const card = cards[index];
+            const cardElement = document.querySelector(`[data-index="${index}"]`);
+            
+            // Prevent clicking if card is already flipped or matched
+            if (card.flipped || card.matched) return;
+            
+            // Prevent clicking more than 2 cards
+            if (flippedCards.length >= 2) return;
+
+            // Flip card
+            card.flipped = true;
+            cardElement.classList.add('flipped');
+            flippedCards.push({ index, icon: card.icon, element: cardElement });
+
+            // Play flip sound (using Web Audio API)
+            playSound(200, 0.1);
+
+            // Check if we have 2 cards flipped
+            if (flippedCards.length === 2) {
+                moves++;
+                updateMoves();
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            lockBoard = true;
+            
+            const [card1, card2] = flippedCards;
+            
+            if (card1.icon === card2.icon) {
+                // Match found
+                setTimeout(() => {
+                    cards[card1.index].matched = true;
+                    cards[card2.index].matched = true;
+                    
+                    card1.element.classList.add('matched');
+                    card2.element.classList.add('matched');
+                    
+                    matchedPairs++;
+                    updatePairs();
+                    
+                    // Play match sound
+                    playSound(400, 0.1);
+                    
+                    flippedCards = [];
+                    lockBoard = false;
+                    
+                    // Check for victory
+                    if (matchedPairs === totalPairs) {
+                        gameVictory();
+                    }
+                }, 300);
+            } else {
+                // No match - flip back
+                setTimeout(() => {
+                    cards[card1.index].flipped = false;
+                    cards[card2.index].flipped = false;
+                    
+                    card1.element.classList.remove('flipped');
+                    card2.element.classList.remove('flipped');
+                    
+                    flippedCards = [];
+                    lockBoard = false;
+                }, 800);
+            }
+        }
+
+        // ========== TIMER ==========
+        function startTimer() {
+            timer = 0;
+            updateTimerDisplay();
+            
+            if (timerInterval) clearInterval(timerInterval);
+            
+            timerInterval = setInterval(() => {
+                if (gameStarted && !gameCompleted) {
+                    timer++;
+                    updateTimerDisplay();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timer / 60);
+            const seconds = timer % 60;
+            document.getElementById('timer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // ========== UI UPDATES ==========
+        function updateMoves() {
+            document.getElementById('moves').textContent = moves;
+        }
+
+        function updatePairs() {
+            document.getElementById('pairs').textContent = `${matchedPairs}/${totalPairs}`;
+        }
+
+        // ========== VICTORY ==========
+        function gameVictory() {
+            gameCompleted = true;
+            clearInterval(timerInterval);
+            
+            // Update best score
+            if (bestScore === 0 || moves < bestScore) {
+                bestScore = moves;
+                localStorage.setItem('memoryBestScore', bestScore);
+            }
+            
+            // Show victory overlay
+            document.getElementById('victoryStats').innerHTML = `
+                Moves: ${moves}<br>
+                Time: ${document.getElementById('timer').textContent}<br>
+                Best: ${bestScore}
+            `;
+            document.getElementById('victoryOverlay').style.display = 'flex';
+            
+            // Play victory sound
+            playSound(600, 0.2);
+            
+            // Create confetti
+            createConfetti();
+        }
+
+        function createConfetti() {
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                    confetti.style.animationDelay = Math.random() * 2 + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 50);
+            }
+        }
+
+        // ========== SOUND EFFECTS ==========
+        function playSound(frequency, duration) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = frequency;
+            gainNode.gain.value = 0.1;
+            
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + duration);
+        }
+
+        // ========== GAME CONTROL FUNCTIONS ==========
+        function restartGame() {
+            resetGameState();
+            createBoard();
+            clearInterval(timerInterval);
+            startTimer();
+        }
+
+        function playAgain() {
+            document.getElementById('victoryOverlay').style.display = 'none';
+            restartGame();
+        }
+
+        function backToMenu() {
+            clearInterval(timerInterval);
+            document.getElementById('gameScreen').style.display = 'none';
+            document.getElementById('themeScreen').style.display = 'block';
+            document.getElementById('victoryOverlay').style.display = 'none';
+        }
+
+        // Initialize default theme
+        setTheme('neon');
+    </script>
+</body>
+</html>

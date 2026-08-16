@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PATHFINDING • VISUALIZER</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --bg-gradient-1: #141E30;
+            --bg-gradient-2: #243B55;
+            --panel-bg: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.15);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --accent-color: #00E5FF;
+            --start-color: #ff4d4d;
+            --end-color: #ff4d4d;
+            --visited-color: #00E5FF;
+            --path-color: #00ff88;
+            --default-node: #2c5364;
+            --border-glow: rgba(0, 229, 255, 0.5);
+            --shadow-neon: 0 0 20px #00E5FF;
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, var(--bg-gradient-1), var(--bg-gradient-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            position: relative;
+            overflow-x: hidden;
+            animation: gradientMove 15s ease infinite;
+            background-size: 400% 400%;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Main container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            box-shadow: 0 30px 60px -15px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 10;
+            border: 1px solid rgba(255,255,255,0.1);
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.3rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--card-bg);
+            border-radius: 3rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .control-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .algorithm-select {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid var(--accent-color);
+            color: var(--text-primary);
+            padding: 0.8rem 1.5rem;
+            border-radius: 2rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            outline: none;
+        }
+
+        .algorithm-select:hover {
+            box-shadow: var(--shadow-neon);
+        }
+
+        .algorithm-select option {
+            background: var(--bg-gradient-2);
+            color: var(--text-primary);
+        }
+
+        .btn {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid var(--accent-color);
+            color: var(--text-primary);
+            padding: 0.8rem 1.5rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: var(--accent-color);
+            color: var(--bg-gradient-1);
+            box-shadow: var(--shadow-neon);
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: var(--bg-gradient-1);
+        }
+
+        /* Stats Panel */
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--card-bg);
+            border-radius: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 0.8rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 1.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-value {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-unit {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-left: 0.2rem;
+        }
+
+        /* Grid Container */
+        .grid-container {
+            background: var(--card-bg);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow-x: auto;
+        }
+
+        .grid {
+            display: grid;
+            gap: 2px;
+            background: rgba(255,255,255,0.1);
+            padding: 2px;
+            border-radius: 8px;
+            width: fit-content;
+            margin: 0 auto;
+        }
+
+        .node {
+            width: 25px;
+            height: 25px;
+            background: var(--default-node);
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .node.start {
+            background: var(--start-color);
+            box-shadow: 0 0 15px var(--start-color);
+            animation: pulse 1.5s infinite;
+        }
+
+        .node.end {
+            background: var(--end-color);
+            box-shadow: 0 0 15px var(--end-color);
+            animation: pulse 1.5s infinite;
+        }
+
+        .node.visited {
+            background: var(--visited-color);
+            animation: visitedPulse 0.5s ease;
+        }
+
+        .node.path {
+            background: var(--path-color);
+            animation: pathPulse 0.5s ease;
+            box-shadow: 0 0 20px var(--path-color);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes visitedPulse {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes pathPulse {
+            0% { transform: scale(0.9); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .node.start::after {
+            content: 'S';
+        }
+
+        .node.end::after {
+            content: 'E';
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .legend-color.start { background: var(--start-color); }
+        .legend-color.end { background: var(--end-color); }
+        .legend-color.visited { background: var(--visited-color); }
+        .legend-color.path { background: var(--path-color); }
+        .legend-color.default { background: var(--default-node); }
+
+        .legend-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .title { font-size: 1.8rem; }
+            .node { width: 20px; height: 20px; font-size: 0.6rem; }
+            .control-panel { border-radius: 2rem; }
+            .stats-panel { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 480px) {
+            .node { width: 18px; height: 18px; }
+            .btn { padding: 0.6rem 1rem; font-size: 0.8rem; }
+            .algorithm-select { padding: 0.6rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">PATHFINDING • VISUALIZER</div>
+            <div class="subtitle">DIJKSTRA • A* • SHORTEST PATH</div>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <div class="control-group">
+                <select class="algorithm-select" id="algorithmSelect">
+                    <option value="dijkstra">Dijkstra's Algorithm</option>
+                    <option value="astar">A* Algorithm</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <button class="btn btn-primary" id="startBtn">▶ Start Visualization</button>
+                <button class="btn" id="resetBtn">🔄 Reset Grid</button>
+                <button class="btn" id="randomBtn">🎲 New Random Points</button>
+            </div>
+        </div>
+
+        <!-- Stats Panel -->
+        <div class="stats-panel">
+            <div class="stat-item">
+                <div class="stat-label">Algorithm</div>
+                <div class="stat-value" id="algorithmName">Dijkstra</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Time Taken</div>
+                <div class="stat-value" id="timeTaken">0<span class="stat-unit">ms</span></div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Nodes Visited</div>
+                <div class="stat-value" id="nodesVisited">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Path Length</div>
+                <div class="stat-value" id="pathLength">0</div>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color start"></div>
+                <span class="legend-text">Start</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color end"></div>
+                <span class="legend-text">End</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color visited"></div>
+                <span class="legend-text">Visited</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color path"></div>
+                <span class="legend-text">Path</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color default"></div>
+                <span class="legend-text">Unvisited</span>
+            </div>
+        </div>
+
+        <!-- Grid Container -->
+        <div class="grid-container">
+            <div id="grid" class="grid"></div>
+        </div>
+
+        <div class="footer">
+            ⚡ Watch algorithms find the shortest path in real-time
+        </div>
+    </div>
+
+    <script>
+        // ========== GLOBAL VARIABLES ==========
+        const ROWS = 20;
+        const COLS = 20;
+        let grid = [];
+        let startNode = null;
+        let endNode = null;
+        let isAnimating = false;
+        let animationTimeout = null;
+
+        // DOM Elements
+        const gridElement = document.getElementById('grid');
+        const algorithmSelect = document.getElementById('algorithmSelect');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const randomBtn = document.getElementById('randomBtn');
+        const algorithmName = document.getElementById('algorithmName');
+        const timeTaken = document.getElementById('timeTaken');
+        const nodesVisited = document.getElementById('nodesVisited');
+        const pathLength = document.getElementById('pathLength');
+
+        // ========== GRID INITIALIZATION ==========
+        function initGrid() {
+            grid = [];
+            for (let row = 0; row < ROWS; row++) {
+                const rowArray = [];
+                for (let col = 0; col < COLS; col++) {
+                    rowArray.push({
+                        row,
+                        col,
+                        isStart: false,
+                        isEnd: false,
+                        isVisited: false,
+                        isPath: false,
+                        distance: Infinity,
+                        heuristic: 0,
+                        previousNode: null,
+                        f: Infinity,
+                        g: Infinity,
+                        h: Infinity
+                    });
+                }
+                grid.push(rowArray);
+            }
+        }
+
+        function renderGrid() {
+            gridElement.style.gridTemplateColumns = `repeat(${COLS}, 1fr)`;
+            
+            let html = '';
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    const node = grid[row][col];
+                    let classes = 'node';
+                    if (node.isStart) classes += ' start';
+                    if (node.isEnd) classes += ' end';
+                    if (node.isVisited && !node.isStart && !node.isEnd) classes += ' visited';
+                    if (node.isPath && !node.isStart && !node.isEnd) classes += ' path';
+                    
+                    html += `<div class="${classes}" data-row="${row}" data-col="${col}"></div>`;
+                }
+            }
+            gridElement.innerHTML = html;
+        }
+
+        // ========== RANDOM START/END SELECTION ==========
+        function selectRandomPoints() {
+            // Clear previous start/end
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    grid[row][col].isStart = false;
+                    grid[row][col].isEnd = false;
+                }
+            }
+
+            // Select random start
+            let startRow = Math.floor(Math.random() * ROWS);
+            let startCol = Math.floor(Math.random() * COLS);
+            
+            // Select random end (different from start)
+            let endRow, endCol;
+            do {
+                endRow = Math.floor(Math.random() * ROWS);
+                endCol = Math.floor(Math.random() * COLS);
+            } while (endRow === startRow && endCol === startCol);
+
+            grid[startRow][startCol].isStart = true;
+            grid[endRow][endCol].isEnd = true;
+            
+            startNode = { row: startRow, col: startCol };
+            endNode = { row: endRow, col: endCol };
+            
+            renderGrid();
+        }
+
+        // ========== RESET GRID ==========
+        function resetGrid() {
+            if (animationTimeout) {
+                clearTimeout(animationTimeout);
+                animationTimeout = null;
+            }
+            isAnimating = false;
+            
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    grid[row][col].isVisited = false;
+                    grid[row][col].isPath = false;
+                    grid[row][col].distance = Infinity;
+                    grid[row][col].previousNode = null;
+                    grid[row][col].f = Infinity;
+                    grid[row][col].g = Infinity;
+                    grid[row][col].h = Infinity;
+                }
+            }
+            
+            // Reset stats
+            timeTaken.textContent = '0';
+            nodesVisited.textContent = '0';
+            pathLength.textContent = '0';
+            
+            renderGrid();
+        }
+
+        // ========== HELPER FUNCTIONS ==========
+        function getNeighbors(node) {
+            const neighbors = [];
+            const { row, col } = node;
+            
+            if (row > 0) neighbors.push(grid[row - 1][col]); // Up
+            if (row < ROWS - 1) neighbors.push(grid[row + 1][col]); // Down
+            if (col > 0) neighbors.push(grid[row][col - 1]); // Left
+            if (col < COLS - 1) neighbors.push(grid[row][col + 1]); // Right
+            
+            return neighbors;
+        }
+
+        function heuristic(node, end) {
+            // Manhattan distance
+            return Math.abs(node.row - end.row) + Math.abs(node.col - end.col);
+        }
+
+        // ========== ANIMATION FUNCTIONS ==========
+        async function visualizeAlgorithm(algorithm) {
+            if (isAnimating) return;
+            
+            resetGrid();
+            isAnimating = true;
+            startBtn.disabled = true;
+            randomBtn.disabled = true;
+            
+            const startTime = performance.now();
+            
+            let visitedNodesInOrder;
+            if (algorithm === 'dijkstra') {
+                visitedNodesInOrder = await runDijkstra();
+            } else {
+                visitedNodesInOrder = await runAStar();
+            }
+            
+            const endTime = performance.now();
+            timeTaken.textContent = (endTime - startTime).toFixed(2);
+            
+            // Animate visited nodes
+            await animateVisitedNodes(visitedNodesInOrder);
+            
+            // Animate path
+            const path = reconstructPath();
+            await animatePath(path);
+            
+            // Update stats
+            nodesVisited.textContent = visitedNodesInOrder.length;
+            pathLength.textContent = path.length;
+            
+            isAnimating = false;
+            startBtn.disabled = false;
+            randomBtn.disabled = false;
+        }
+
+        async function animateVisitedNodes(visitedNodes) {
+            for (let i = 0; i < visitedNodes.length; i++) {
+                const node = visitedNodes[i];
+                if (!node.isStart && !node.isEnd) {
+                    node.isVisited = true;
+                    renderGrid();
+                    await sleep(10);
+                }
+            }
+        }
+
+        async function animatePath(path) {
+            for (let i = 0; i < path.length; i++) {
+                const node = path[i];
+                if (!node.isStart && !node.isEnd) {
+                    node.isPath = true;
+                    renderGrid();
+                    await sleep(30);
+                }
+            }
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => {
+                animationTimeout = setTimeout(resolve, ms);
+            });
+        }
+
+        // ========== DIJKSTRA ALGORITHM ==========
+        async function runDijkstra() {
+            const visitedNodesInOrder = [];
+            
+            // Initialize
+            grid[startNode.row][startNode.col].distance = 0;
+            const unvisitedNodes = getAllNodes();
+            
+            while (unvisitedNodes.length) {
+                // Sort by distance
+                unvisitedNodes.sort((a, b) => a.distance - b.distance);
+                const currentNode = unvisitedNodes.shift();
+                
+                // Skip if wall (not implemented)
+                if (currentNode.distance === Infinity) break;
+                
+                // Mark as visited
+                if (!currentNode.isStart && !currentNode.isEnd) {
+                    visitedNodesInOrder.push(currentNode);
+                }
+                
+                // Check if reached end
+                if (currentNode.isEnd) break;
+                
+                // Update neighbors
+                const neighbors = getNeighbors(currentNode);
+                for (const neighbor of neighbors) {
+                    const newDistance = currentNode.distance + 1;
+                    if (newDistance < neighbor.distance) {
+                        neighbor.distance = newDistance;
+                        neighbor.previousNode = currentNode;
+                    }
+                }
+            }
+            
+            return visitedNodesInOrder;
+        }
+
+        // ========== A* ALGORITHM ==========
+        async function runAStar() {
+            const visitedNodesInOrder = [];
+            
+            // Initialize
+            const start = grid[startNode.row][startNode.col];
+            start.g = 0;
+            start.f = heuristic(start, grid[endNode.row][endNode.col]);
+            
+            const openSet = [start];
+            const closedSet = [];
+            
+            while (openSet.length) {
+                // Get node with lowest f score
+                openSet.sort((a, b) => a.f - b.f);
+                const currentNode = openSet.shift();
+                
+                // Add to closed set
+                if (!currentNode.isStart && !currentNode.isEnd) {
+                    visitedNodesInOrder.push(currentNode);
+                }
+                
+                // Check if reached end
+                if (currentNode.isEnd) {
+                    break;
+                }
+                
+                // Process neighbors
+                const neighbors = getNeighbors(currentNode);
+                for (const neighbor of neighbors) {
+                    if (neighbor.isEnd) {
+                        neighbor.previousNode = currentNode;
+                        break;
+                    }
+                    
+                    const tentativeG = currentNode.g + 1;
+                    
+                    if (tentativeG < neighbor.g) {
+                        neighbor.previousNode = currentNode;
+                        neighbor.g = tentativeG;
+                        neighbor.h = heuristic(neighbor, grid[endNode.row][endNode.col]);
+                        neighbor.f = neighbor.g + neighbor.h;
+                        
+                        if (!openSet.includes(neighbor)) {
+                            openSet.push(neighbor);
+                        }
+                    }
+                }
+            }
+            
+            return visitedNodesInOrder;
+        }
+
+        function getAllNodes() {
+            const nodes = [];
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    nodes.push(grid[row][col]);
+                }
+            }
+            return nodes;
+        }
+
+        function reconstructPath() {
+            const path = [];
+            let currentNode = grid[endNode.row][endNode.col];
+            
+            while (currentNode) {
+                path.unshift(currentNode);
+                currentNode = currentNode.previousNode;
+            }
+            
+            return path;
+        }
+
+        // ========== EVENT LISTENERS ==========
+        startBtn.addEventListener('click', () => {
+            const algorithm = algorithmSelect.value;
+            algorithmName.textContent = algorithm === 'dijkstra' ? 'Dijkstra' : 'A*';
+            visualizeAlgorithm(algorithm);
+        });
+
+        resetBtn.addEventListener('click', () => {
+            resetGrid();
+        });
+
+        randomBtn.addEventListener('click', () => {
+            if (!isAnimating) {
+                selectRandomPoints();
+                resetGrid();
+            }
+        });
+
+        // Initialize
+        initGrid();
+        selectRandomPoints();
+        renderGrid();
+    </script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+{
+  "backgrounds": [
+    {
+      "id": "biophilic-green",
+      "name": "Biophilic Green",
+      "image": "background/biophilic-green.png"
+    },
+    {
+      "id": "cool-mint",
+      "name": "Cool Mint",
+      "image": "background/cool-mint.png"
+    },
+    {
+      "id": "dark-charcoal",
+      "name": "Dark Charcoal",
+      "image": "background/dark-charcoal.png"
+    },
+    {
+      "id": "dramatic-night-urban",
+      "name": "Dramatic Night Urban",
+      "image": "background/dramatic-night-urban.png"
+    },
+    {
+      "id": "energy-industrial",
+      "name": "Energy Industrial",
+      "image": "background/energy-industrial.png"
+    },
+    {
+      "id": "night-urban",
+      "name": "Night Urban",
+      "image": "background/night-urban.png"
+    },
+    {
+      "id": "ocean-deep",
+      "name": "Ocean Deep",
+      "image": "background/ocean-deep.png"
+    },
+    {
+      "id": "purple-dream",
+      "name": "Purple Dream",
+      "image": "background/purple-dream.png"
+    },
+    {
+      "id": "sunrise-warm",
+      "name": "Sunrise Warm",
+      "image": "background/sunrise-warm.png"
+    },
+    {
+      "id": "tech-focus",
+      "name": "Tech Focus Blue",
+      "image": "background/tech-focus-blue.jpg"
+    }
+  ]
+}

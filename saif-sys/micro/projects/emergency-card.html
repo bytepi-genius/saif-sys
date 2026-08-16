@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emergency Contact · digital ID card</title>
+  <!-- Google Fonts + QR code library (qrcode.js) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <style>
+    /* ===== RESET & BASE (high contrast, accessible) ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', 'Poppins', sans-serif;
+    }
+
+    :root {
+      --bg-page: #ffffff;
+      --card-bg: #ffffff;
+      --text-primary: #111111;
+      --text-secondary: #2d2d2d;
+      --border-light: #dddddd;
+      --accent-emergency: #d32f2f;
+      --accent-red-bright: #c62828;
+      --accent-blue: #1565c0;
+      --badge-red-bg: #ffebee;
+      --badge-red-text: #b71c1c;
+      --shadow-card: 0 15px 30px -12px rgba(0,0,0,0.2);
+      --call-btn: #2e7d32;
+      --call-btn-hover: #1b5e20;
+      --input-bg: #f9f9f9;
+    }
+
+    body.dark {
+      --bg-page: #121212;
+      --card-bg: #1e1e1e;
+      --text-primary: #f5f5f5;
+      --text-secondary: #cccccc;
+      --border-light: #444444;
+      --accent-emergency: #ef5350;
+      --accent-red-bright: #e57373;
+      --badge-red-bg: #4a1c1c;
+      --badge-red-text: #ffcdd2;
+      --call-btn: #2e7d32;
+      --shadow-card: 0 15px 30px -8px #000000aa;
+      --input-bg: #2a2a2a;
+    }
+
+    body {
+      background: var(--bg-page);
+      color: var(--text-primary);
+      padding: 1.5rem;
+      min-height: 100vh;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .app-container {
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2.5rem;
+    }
+    .title h1 {
+      font-weight: 800;
+      font-size: 2.2rem;
+      color: var(--accent-emergency);
+      letter-spacing: -0.5px;
+    }
+    .title p {
+      font-size: 1rem;
+      color: var(--text-secondary);
+    }
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    .theme-toggle {
+      background: var(--card-bg);
+      border: 1px solid var(--border-light);
+      border-radius: 40px;
+      padding: 0.5rem 1.2rem;
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--accent-emergency);
+      color: var(--accent-emergency);
+      font-weight: 600;
+      padding: 0.6rem 1.8rem;
+      border-radius: 40px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .btn-outline:hover { background: var(--accent-emergency); color: white; }
+
+    /* ===== MAIN LAYOUT: form + card ===== */
+    .dashboard {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 2.5rem;
+      align-items: start;
+    }
+
+    /* form card */
+    .form-card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 2rem;
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border-light);
+    }
+    .form-card h2 {
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      color: var(--accent-blue);
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .field.full { grid-column: span 2; }
+    .field label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+    .field input, .field textarea {
+      background: var(--input-bg);
+      border: 1px solid var(--border-light);
+      border-radius: 30px;
+      padding: 0.8rem 1.2rem;
+      font-size: 1rem;
+      color: var(--text-primary);
+      outline: none;
+    }
+    .field input:focus { border-color: var(--accent-blue); }
+    .file-upload {
+      background: var(--input-bg);
+      border-radius: 30px;
+      padding: 0.5rem;
+    }
+    .error-msg {
+      color: #b71c1c;
+      background: #ffcdd2;
+      padding: 0.5rem 1rem;
+      border-radius: 30px;
+      margin-top: 1rem;
+    }
+    .hidden { display: none; }
+
+    .btn-primary {
+      background: var(--accent-emergency);
+      color: white;
+      border: none;
+      font-weight: 700;
+      padding: 1rem 2rem;
+      border-radius: 40px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 1.5rem;
+      box-shadow: 0 8px 18px #c6282850;
+    }
+
+    /* ===== EMERGENCY CARD ===== */
+    .card-preview {
+      background: var(--card-bg);
+      border-radius: 32px;
+      padding: 2rem;
+      box-shadow: var(--shadow-card);
+      border: 2px solid var(--accent-emergency);
+    }
+    .emergency-header {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    .profile-photo {
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      background: #eee;
+      border: 3px solid var(--accent-emergency);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: #aaa;
+      overflow: hidden;
+    }
+    .profile-photo img { width: 100%; height: 100%; object-fit: cover; }
+    .name-large {
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+    .blood-badge {
+      background: var(--badge-red-bg);
+      color: var(--badge-red-text);
+      font-weight: 800;
+      font-size: 2rem;
+      padding: 0.3rem 2rem;
+      border-radius: 60px;
+      display: inline-block;
+      border: 2px solid var(--accent-emergency);
+    }
+    .call-button {
+      background: var(--call-btn);
+      color: white;
+      font-size: 2rem;
+      padding: 1rem 2rem;
+      border-radius: 60px;
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      text-decoration: none;
+      font-weight: 700;
+      margin: 1rem 0;
+      box-shadow: 0 8px 18px #1b5e20;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 #2e7d32aa; }
+      70% { box-shadow: 0 0 0 20px #2e7d3200; }
+      100% { box-shadow: 0 0 0 0 #2e7d3200; }
+    }
+    .info-section {
+      margin: 2rem 0;
+    }
+    .info-row {
+      display: flex;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid var(--border-light);
+      font-size: 1.3rem;
+    }
+    .info-label {
+      font-weight: 700;
+      width: 170px;
+    }
+    .warning-box {
+      background: #ffebee;
+      border-left: 8px solid #c62828;
+      padding: 1.5rem;
+      border-radius: 24px;
+      margin: 1.5rem 0;
+      font-size: 1.4rem;
+      color: #b71c1c;
+      font-weight: 600;
+    }
+    .qr-section {
+      text-align: center;
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: var(--input-bg);
+      border-radius: 32px;
+    }
+    .qr-code {
+      display: flex;
+      justify-content: center;
+      margin: 1rem 0;
+    }
+    .qr-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn-secondary {
+      background: var(--accent-blue);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.8rem;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* empty state */
+    .empty-card {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-secondary);
+    }
+
+    /* toast */
+    .toast {
+      position: fixed; bottom: 2rem; right: 2rem;
+      background: #2e7d32; color: white; padding: 1rem 2rem; border-radius: 60px; box-shadow: 0 10px 30px #00000050;
+      transform: translateY(200%); transition: transform 0.3s; z-index: 1000;
+    }
+    .toast.show { transform: translateY(0); }
+
+    /* fab edit */
+    .fab-edit {
+      position: fixed; bottom: 2rem; left: 2rem;
+      background: var(--accent-blue); color: white; width: 60px; height: 60px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; cursor: pointer; box-shadow: 0 15px 30px #1565c0; z-index: 100;
+    }
+
+    /* responsive */
+    @media (max-width: 900px) {
+      .dashboard { grid-template-columns: 1fr; }
+      .name-large { font-size: 2.2rem; }
+    }
+    @media print {
+      .fab-edit, .header-actions, .btn-primary, .qr-section, .form-card { display: none; }
+      .card-preview { border: 2px solid black; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- header -->
+    <header class="header">
+      <div class="title">
+        <h1>⚠️ Emergency ID</h1>
+        <p>Critical info · quick access</p>
+      </div>
+      <div class="header-actions">
+        <div class="theme-toggle" id="themeToggle"><span>☀️</span><span>🌙</span></div>
+        <button class="btn-outline" id="resetBtn"><i class="fas fa-trash-alt"></i> Reset</button>
+      </div>
+    </header>
+
+    <!-- main dashboard -->
+    <div class="dashboard">
+      <!-- left: form -->
+      <div class="form-card" id="formSection">
+        <h2><i class="fas fa-notes-medical"></i> Your details</h2>
+        <div class="form-grid">
+          <div class="field full"><label>Full name *</label><input id="fullName" placeholder="e.g. Alex Johnson"></div>
+          <div class="field full"><label>Profile photo</label><input type="file" id="photoUpload" accept="image/*" class="file-upload"></div>
+          <div class="field"><label>Blood group *</label><input id="bloodGroup" placeholder="O+"></div>
+          <div class="field"><label>Date of birth *</label><input type="date" id="dob"></div>
+          <div class="field full"><label>Emergency contact name *</label><input id="emergencyName" placeholder="Jane Doe"></div>
+          <div class="field"><label>Emergency phone *</label><input id="emergencyPhone" placeholder="+1 555 123 4567"></div>
+          <div class="field"><label>Secondary phone</label><input id="secondaryPhone" placeholder="+1 555 987 6543"></div>
+          <div class="field full"><label>Allergies</label><textarea id="allergies" rows="2" placeholder="Peanuts, penicillin ..."></textarea></div>
+          <div class="field full"><label>Medical conditions</label><textarea id="conditions" rows="2"></textarea></div>
+          <div class="field full"><label>Medications</label><textarea id="medications" rows="2"></textarea></div>
+          <div class="field full"><label>Address</label><textarea id="address" rows="2"></textarea></div>
+          <div class="field full"><label>Notes</label><textarea id="notes" rows="2"></textarea></div>
+        </div>
+        <div id="formError" class="error-msg hidden"></div>
+        <button class="btn-primary" id="saveProfileBtn"><i class="fas fa-save"></i> Save emergency card</button>
+      </div>
+
+      <!-- right: emergency card preview -->
+      <div class="card-preview" id="cardPreview">
+        <div id="emptyCardMessage" class="empty-card">
+          <i class="fas fa-id-card fa-4x"></i>
+          <p>No profile yet. Fill the form to generate your emergency card.</p>
+        </div>
+        <div id="emergencyCardContent" style="display: none;">
+          <!-- dynamic content filled by js -->
+        </div>
+      </div>
+    </div>
+
+    <!-- floating edit button (unlock form) -->
+    <div class="fab-edit" id="fabEdit" title="Edit profile"><i class="fas fa-pen"></i></div>
+  </div>
+
+  <!-- toast -->
+  <div class="toast" id="toast">Profile saved</div>
+
+  <script>
+    (function() {
+      // DOM elements
+      const fullName = document.getElementById('fullName');
+      const bloodGroup = document.getElementById('bloodGroup');
+      const dob = document.getElementById('dob');
+      const emergencyName = document.getElementById('emergencyName');
+      const emergencyPhone = document.getElementById('emergencyPhone');
+      const secondaryPhone = document.getElementById('secondaryPhone');
+      const allergies = document.getElementById('allergies');
+      const conditions = document.getElementById('conditions');
+      const medications = document.getElementById('medications');
+      const address = document.getElementById('address');
+      const notes = document.getElementById('notes');
+      const photoUpload = document.getElementById('photoUpload');
+      const saveBtn = document.getElementById('saveProfileBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const themeToggle = document.getElementById('themeToggle');
+      const fabEdit = document.getElementById('fabEdit');
+      const formError = document.getElementById('formError');
+      const emptyMsg = document.getElementById('emptyCardMessage');
+      const cardContent = document.getElementById('emergencyCardContent');
+      const toastEl = document.getElementById('toast');
+
+      let profileData = null;
+
+      // ---------- load from localStorage ----------
+      function loadProfile() {
+        const stored = localStorage.getItem('emergencyProfile');
+        if (stored) {
+          profileData = JSON.parse(stored);
+          renderCard(profileData);
+          fillForm(profileData);
+          emptyMsg.style.display = 'none';
+          cardContent.style.display = 'block';
+        } else {
+          emptyMsg.style.display = 'block';
+          cardContent.style.display = 'none';
+        }
+      }
+
+      function fillForm(data) {
+        fullName.value = data.name || '';
+        bloodGroup.value = data.blood || '';
+        dob.value = data.dob || '';
+        emergencyName.value = data.emergencyName || '';
+        emergencyPhone.value = data.emergencyPhone || '';
+        secondaryPhone.value = data.secondaryPhone || '';
+        allergies.value = data.allergies || '';
+        conditions.value = data.conditions || '';
+        medications.value = data.medications || '';
+        address.value = data.address || '';
+        notes.value = data.notes || '';
+        // photo is file, not prefilled for security
+      }
+
+      // render emergency card (large accessible layout)
+      function renderCard(data) {
+        const photoHtml = data.photo ? `<img src="${data.photo}" alt="profile">` : '<i class="fas fa-user-circle"></i>';
+        const allergyHtml = data.allergies ? `<div class="warning-box"><i class="fas fa-exclamation-triangle"></i> ⚠️ ALLERGIES: ${data.allergies}</div>` : '';
+        const callLink = `tel:${data.emergencyPhone}`;
+
+        cardContent.innerHTML = `
+          <div class="emergency-header">
+            <div class="profile-photo">${photoHtml}</div>
+            <div>
+              <div class="name-large">${data.name || '—'}</div>
+              <span class="blood-badge">${data.blood || '?'}</span>
+            </div>
+          </div>
+          <a href="${callLink}" class="call-button"><i class="fas fa-phone-alt"></i> ${data.emergencyPhone}</a>
+          <div class="info-section">
+            <div class="info-row"><span class="info-label">Emergency contact</span> ${data.emergencyName || '—'}</div>
+            ${data.secondaryPhone ? `<div class="info-row"><span class="info-label">Secondary</span> ${data.secondaryPhone}</div>` : ''}
+            <div class="info-row"><span class="info-label">DOB</span> ${data.dob || '—'}</div>
+            ${data.conditions ? `<div class="info-row"><span class="info-label">Conditions</span> ${data.conditions}</div>` : ''}
+            ${data.medications ? `<div class="info-row"><span class="info-label">Medications</span> ${data.medications}</div>` : ''}
+            <div class="info-row"><span class="info-label">Address</span> ${data.address || '—'}</div>
+            ${data.notes ? `<div class="info-row"><span class="info-label">Notes</span> ${data.notes}</div>` : ''}
+          </div>
+          ${allergyHtml}
+          <!-- QR code section inside card? we'll add below -->
+        `;
+        emptyMsg.style.display = 'none';
+        cardContent.style.display = 'block';
+
+        // generate QR code linking to current page (or profile view)
+        const qrContainer = document.createElement('div');
+        qrContainer.className = 'qr-section';
+        qrContainer.innerHTML = '<h3>Emergency QR</h3><div class="qr-code" id="qrCodeImg"></div><div class="qr-actions"><button class="btn-secondary" id="downloadQR">Download QR</button><button class="btn-secondary" id="downloadPDF">Print / PDF</button></div>';
+        cardContent.appendChild(qrContainer);
+
+        // generate QR with profile data (as URL fragment)
+        const profileUrl = window.location.href.split('#')[0] + '#profile-' + encodeURIComponent(JSON.stringify(data));
+        QRCode.toCanvas(document.createElement('canvas'), profileUrl, { width: 160 }, function(err, canvas) {
+          if (err) return;
+          document.getElementById('qrCodeImg').innerHTML = '';
+          document.getElementById('qrCodeImg').appendChild(canvas);
+        });
+
+        document.getElementById('downloadQR').addEventListener('click', () => {
+          const canvas = document.querySelector('#qrCodeImg canvas');
+          if (canvas) {
+            const link = document.createElement('a');
+            link.download = 'emergency-qr.png';
+            link.href = canvas.toDataURL();
+            link.click();
+          }
+        });
+        document.getElementById('downloadPDF').addEventListener('click', () => window.print());
+      }
+
+      // validation
+      function validateForm() {
+        if (!fullName.value.trim() || !bloodGroup.value.trim() || !dob.value || !emergencyName.value.trim() || !emergencyPhone.value.trim()) {
+          return 'Name, Blood group, DOB, Emergency contact and phone are required.';
+        }
+        const phoneRegex = /^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,5}$/;
+        if (!phoneRegex.test(emergencyPhone.value.trim())) return 'Enter a valid emergency phone number.';
+        return null;
+      }
+
+      function saveProfile() {
+        const err = validateForm();
+        if (err) { formError.innerText = err; formError.classList.remove('hidden'); return; }
+        formError.classList.add('hidden');
+
+        // convert photo to base64 if any
+        const file = photoUpload.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const photoData = e.target.result;
+            saveToStorage(photoData);
+          };
+          reader.readAsDataURL(file);
+        } else {
+          saveToStorage(profileData?.photo || null);
+        }
+      }
+
+      function saveToStorage(photoData) {
+        const data = {
+          name: fullName.value.trim(),
+          blood: bloodGroup.value.trim().toUpperCase(),
+          dob: dob.value,
+          emergencyName: emergencyName.value.trim(),
+          emergencyPhone: emergencyPhone.value.trim(),
+          secondaryPhone: secondaryPhone.value.trim(),
+          allergies: allergies.value.trim(),
+          conditions: conditions.value.trim(),
+          medications: medications.value.trim(),
+          address: address.value.trim(),
+          notes: notes.value.trim(),
+          photo: photoData,
+        };
+        profileData = data;
+        localStorage.setItem('emergencyProfile', JSON.stringify(data));
+        renderCard(data);
+        showToast('Profile saved');
+      }
+
+      function resetProfile() {
+        if (confirm('Delete emergency profile?')) {
+          localStorage.removeItem('emergencyProfile');
+          profileData = null;
+          emptyMsg.style.display = 'block';
+          cardContent.style.display = 'none';
+          fullName.value = bloodGroup.value = dob.value = emergencyName.value = emergencyPhone.value = secondaryPhone.value = allergies.value = conditions.value = medications.value = address.value = notes.value = '';
+          photoUpload.value = '';
+          showToast('Profile cleared');
+        }
+      }
+
+      function showToast(msg) { toastEl.innerText=msg; toastEl.classList.add('show'); setTimeout(()=>toastEl.classList.remove('show'),2000); }
+
+      // unlock form (scroll)
+      fabEdit.addEventListener('click', () => { document.getElementById('formSection').scrollIntoView({ behavior:'smooth' }); });
+
+      // theme toggle
+      themeToggle.addEventListener('click', () => document.body.classList.toggle('dark'));
+
+      // events
+      saveBtn.addEventListener('click', saveProfile);
+      resetBtn.addEventListener('click', resetProfile);
+
+      // initial load
+      loadProfile();
+    })();
+  </script>
+</body>
+</html>

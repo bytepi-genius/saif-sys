@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carbon Footprint · sustainability dashboard</title>
+  <!-- Google Fonts + Chart.js + Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* ===== ECO COLOR PALETTE ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', 'Poppins', sans-serif;
+    }
+
+    :root {
+      --bg-body: #f6fef5;
+      --card-bg: #ffffff;
+      --text-primary: #1f3b2c;
+      --text-secondary: #2d5a4b;
+      --accent-green: #2e7d5e;
+      --accent-teal: #178f8a;
+      --accent-mint: #b6e6d9;
+      --earth-brown: #8b6e4b;
+      --border-soft: #d0e6d5;
+      --shadow-sm: 0 12px 30px -8px rgba(46,125,94,0.12);
+      --shadow-hover: 0 20px 35px -12px #2e7d5e40;
+      --low-impact: #5cb85c;
+      --medium-impact: #f0ad4e;
+      --high-impact: #d9534f;
+      --slider-bg: #c8e6d9;
+    }
+
+    body.dark {
+      --bg-body: #0e2b1d;
+      --card-bg: #1e4235;
+      --text-primary: #e2f0e7;
+      --text-secondary: #b8d9cc;
+      --accent-green: #2e9b7a;
+      --accent-teal: #3ab9b3;
+      --accent-mint: #347a67;
+      --earth-brown: #a88f6e;
+      --border-soft: #2d5a4b;
+      --slider-bg: #2d5a4b;
+    }
+
+    body {
+      background: var(--bg-body);
+      color: var(--text-primary);
+      padding: 1.5rem;
+      min-height: 100vh;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .app-container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      border-radius: 60px;
+      padding: 0.8rem 2rem;
+      margin-bottom: 2.5rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-soft);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .logo i {
+      font-size: 2.5rem;
+      color: var(--accent-green);
+    }
+    .logo h1 {
+      font-weight: 700;
+      background: linear-gradient(130deg, #2e7d5e, #178f8a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .logo p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    .theme-toggle {
+      background: var(--border-soft);
+      border-radius: 40px;
+      padding: 0.5rem 1.2rem;
+      cursor: pointer;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    /* ===== STEP INDICATOR ===== */
+    .step-indicator {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      background: var(--card-bg);
+      padding: 1rem 2rem;
+      border-radius: 60px;
+      border: 1px solid var(--border-soft);
+    }
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+    }
+    .step.active {
+      color: var(--accent-green);
+      font-weight: 700;
+    }
+    .step i { font-size: 1.5rem; }
+
+    /* ===== INPUT CARDS (multi-step wizard) ===== */
+    .step-panel {
+      display: none;
+      animation: slideIn 0.4s;
+    }
+    .step-panel.active-panel { display: block; }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.8rem;
+      margin-bottom: 2rem;
+    }
+    .input-card {
+      background: var(--card-bg);
+      border-radius: 28px;
+      padding: 2rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-soft);
+    }
+    .input-card h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      color: var(--accent-green);
+    }
+    .field {
+      margin: 1.2rem 0;
+    }
+    .field label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    .field input, .field select {
+      width: 100%;
+      padding: 0.9rem 1.2rem;
+      border-radius: 40px;
+      border: 1px solid var(--border-soft);
+      background: var(--card-bg);
+      color: var(--text-primary);
+      font-size: 1rem;
+    }
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    input[type=range] {
+      flex: 1;
+      height: 8px;
+      background: var(--slider-bg);
+      border-radius: 20px;
+    }
+    .toggle-switch {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .toggle-switch input {
+      width: 50px; height: 24px;
+      appearance: none;
+      background: #ccc;
+      border-radius: 30px;
+      position: relative;
+      cursor: pointer;
+    }
+    .toggle-switch input:checked {
+      background: var(--accent-green);
+    }
+    .toggle-switch input::before {
+      content: '';
+      position: absolute;
+      width: 20px; height: 20px;
+      background: white;
+      border-radius: 50%;
+      top: 2px; left: 2px;
+      transition: 0.2s;
+    }
+    .toggle-switch input:checked::before { left: 26px; }
+
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin: 2rem 0;
+    }
+    .btn-primary {
+      background: var(--accent-green);
+      color: white;
+      border: none;
+      padding: 1rem 2.5rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: 0 8px 18px #2e7d5e70;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--accent-green);
+      color: var(--accent-green);
+      padding: 1rem 2.5rem;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ===== RESULTS DASHBOARD ===== */
+    .results-dashboard {
+      background: var(--card-bg);
+      border-radius: 32px;
+      padding: 2rem;
+      margin: 2rem 0;
+      border: 1px solid var(--border-soft);
+    }
+    .total-emissions {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .co2-number {
+      font-size: 5rem;
+      font-weight: 800;
+      color: var(--accent-green);
+      line-height: 1;
+    }
+    .co2-unit {
+      font-size: 1.5rem;
+      color: var(--text-secondary);
+    }
+    .comparison-badge {
+      background: var(--accent-mint);
+      padding: 0.5rem 2rem;
+      border-radius: 60px;
+      display: inline-block;
+      margin: 1rem 0;
+    }
+    .progress-container {
+      height: 30px;
+      background: #e0e0e0;
+      border-radius: 30px;
+      margin: 1.5rem 0;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 30px;
+      transition: width 0.6s;
+    }
+    .low { background: var(--low-impact); }
+    .medium { background: var(--medium-impact); }
+    .high { background: var(--high-impact); }
+
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+    .chart-card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 1.5rem;
+      border: 1px solid var(--border-soft);
+    }
+
+    /* ===== SUGGESTIONS ===== */
+    .suggestions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+    .tip-card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 1.5rem;
+      border-left: 8px solid var(--accent-teal);
+      box-shadow: var(--shadow-sm);
+    }
+    .tip-card i { font-size: 2rem; color: var(--accent-green); }
+
+    /* ===== FLOATING RESET ===== */
+    .fab-reset {
+      position: fixed;
+      bottom: 2rem; right: 2rem;
+      background: var(--earth-brown);
+      color: white;
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      cursor: pointer;
+      box-shadow: 0 15px 30px #8b6e4b;
+    }
+
+    /* animations */
+    @keyframes slideIn {
+      0% { opacity: 0; transform: translateX(30px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+
+    /* responsive */
+    @media (max-width: 700px) {
+      .charts-row { grid-template-columns: 1fr; }
+      .co2-number { font-size: 3.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- header -->
+    <header class="header">
+      <div class="logo">
+        <i class="fas fa-leaf"></i>
+        <div>
+          <h1>Carbon Footprint</h1>
+          <p>Understand your impact</p>
+        </div>
+      </div>
+      <div class="theme-toggle" id="themeToggle">
+        <span>☀️</span><span>🌙</span>
+      </div>
+    </header>
+
+    <!-- step indicator -->
+    <div class="step-indicator">
+      <div class="step active" data-step="1"><i class="fas fa-car"></i> Transport</div>
+      <div class="step" data-step="2"><i class="fas fa-bolt"></i> Energy</div>
+      <div class="step" data-step="3"><i class="fas fa-utensils"></i> Lifestyle</div>
+      <div class="step" data-step="4"><i class="fas fa-chart-pie"></i> Results</div>
+    </div>
+
+    <!-- step 1: transportation -->
+    <div class="step-panel active-panel" id="step1">
+      <div class="input-card">
+        <h3><i class="fas fa-car"></i> Transportation</h3>
+        <div class="field">
+          <label>Weekly distance (km)</label>
+          <input type="range" id="carDistance" min="0" max="1000" value="150" step="5">
+          <span id="carDistVal">150 km</span>
+        </div>
+        <div class="field">
+          <label>Vehicle type</label>
+          <select id="vehicleType">
+            <option value="petrol">Petrol</option>
+            <option value="diesel">Diesel</option>
+            <option value="electric">Electric</option>
+            <option value="public">Public transport</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Flights per year</label>
+          <input type="number" id="flights" min="0" max="50" value="2">
+        </div>
+      </div>
+    </div>
+
+    <!-- step 2: energy -->
+    <div class="step-panel" id="step2">
+      <div class="input-card">
+        <h3><i class="fas fa-bolt"></i> Energy Usage</h3>
+        <div class="field">
+          <label>Monthly electricity (kWh)</label>
+          <input type="range" id="electricity" min="0" max="2000" value="300" step="10">
+          <span id="elecVal">300 kWh</span>
+        </div>
+        <div class="field toggle-switch">
+          <label>Renewable energy?</label>
+          <input type="checkbox" id="renewableToggle">
+        </div>
+        <div class="field">
+          <label>Monthly gas usage (therms)</label>
+          <input type="range" id="gas" min="0" max="200" value="40" step="1">
+          <span id="gasVal">40 therms</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- step 3: lifestyle -->
+    <div class="step-panel" id="step3">
+      <div class="input-card">
+        <h3><i class="fas fa-utensils"></i> Lifestyle</h3>
+        <div class="field">
+          <label>Diet type</label>
+          <select id="diet">
+            <option value="vegan">Vegan</option>
+            <option value="vegetarian">Vegetarian</option>
+            <option value="nonveg" selected>Non-vegetarian</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Shopping frequency (monthly items)</label>
+          <input type="range" id="shopping" min="0" max="20" value="5" step="1">
+          <span id="shopVal">5 items</span>
+        </div>
+        <div class="field toggle-switch">
+          <label>Recycle regularly?</label>
+          <input type="checkbox" id="recycleToggle" checked>
+        </div>
+      </div>
+    </div>
+
+    <!-- step 4: results dashboard (will be populated) -->
+    <div class="step-panel" id="step4">
+      <div class="results-dashboard" id="resultsPanel">
+        <!-- dynamic content -->
+      </div>
+    </div>
+
+    <!-- navigation buttons -->
+    <div class="nav-buttons">
+      <button class="btn-outline" id="prevBtn"><i class="fas fa-arrow-left"></i> Previous</button>
+      <button class="btn-primary" id="nextBtn">Next <i class="fas fa-arrow-right"></i></button>
+    </div>
+
+    <!-- floating reset button -->
+    <div class="fab-reset" id="resetBtn"><i class="fas fa-undo-alt"></i></div>
+  </div>
+
+  <script>
+    (function() {
+      // ---------- EMISSION FACTORS (kg CO₂ per unit) ----------
+      const FACTORS = {
+        car: { petrol: 0.192, diesel: 0.171, electric: 0.05, public: 0.03 }, // per km
+        flight: 90, // per flight (short haul)
+        electricity: 0.233, // per kWh (global avg)
+        renewableFactor: 0.05, // if renewable, per kWh
+        gas: 5.3, // per therm
+        diet: { vegan: 600, vegetarian: 800, nonveg: 1600 }, // yearly kg
+        shopping: 15, // per item (fast fashion avg)
+        recycle: 0.8 // multiplier if recycle
+      };
+
+      // ---------- STATE ----------
+      let currentStep = 1;
+      let chartPie, chartBar;
+
+      // DOM elements
+      const steps = document.querySelectorAll('.step');
+      const panels = document.querySelectorAll('.step-panel');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const themeToggle = document.getElementById('themeToggle');
+      const resetBtn = document.getElementById('resetBtn');
+
+      // input elements
+      const carDist = document.getElementById('carDistance');
+      const carDistVal = document.getElementById('carDistVal');
+      const vehicleType = document.getElementById('vehicleType');
+      const flights = document.getElementById('flights');
+      const electricity = document.getElementById('electricity');
+      const elecVal = document.getElementById('elecVal');
+      const renewableToggle = document.getElementById('renewableToggle');
+      const gas = document.getElementById('gas');
+      const gasVal = document.getElementById('gasVal');
+      const diet = document.getElementById('diet');
+      const shopping = document.getElementById('shopping');
+      const shopVal = document.getElementById('shopVal');
+      const recycleToggle = document.getElementById('recycleToggle');
+
+      // ---------- update display values ----------
+      carDist.addEventListener('input', () => carDistVal.innerText = carDist.value + ' km');
+      electricity.addEventListener('input', () => elecVal.innerText = electricity.value + ' kWh');
+      gas.addEventListener('input', () => gasVal.innerText = gas.value + ' therms');
+      shopping.addEventListener('input', () => shopVal.innerText = shopping.value + ' items');
+
+      // ---------- calculation function (returns object) ----------
+      function calculateEmissions() {
+        const carKm = parseFloat(carDist.value) * 52; // yearly
+        const carFactor = FACTORS.car[vehicleType.value] || 0.192;
+        const carEm = carKm * carFactor;
+
+        const flightEm = parseInt(flights.value) * FACTORS.flight;
+
+        let elecEm = parseFloat(electricity.value) * 12 * (renewableToggle.checked ? FACTORS.renewableFactor : FACTORS.electricity);
+        const gasEm = parseFloat(gas.value) * 12 * FACTORS.gas;
+        const energyEm = elecEm + gasEm;
+
+        let dietEm = FACTORS.diet[diet.value] || 1600;
+        const shopEm = parseFloat(shopping.value) * 12 * FACTORS.shopping;
+        let lifestyleEm = dietEm + shopEm;
+        if (recycleToggle.checked) lifestyleEm *= FACTORS.recycle;
+
+        const total = (carEm + flightEm + energyEm + lifestyleEm) / 1000; // tons
+        return {
+          transport: (carEm + flightEm)/1000,
+          energy: energyEm/1000,
+          lifestyle: lifestyleEm/1000,
+          total: total
+        };
+      }
+
+      // ---------- render results dashboard ----------
+      function renderResults() {
+        const em = calculateEmissions();
+        const resultsPanel = document.getElementById('resultsPanel');
+        const avgGlobal = 4.8; // tons CO₂ per person
+        const percentOfAvg = (em.total / avgGlobal) * 100;
+        let impactClass = 'low';
+        if (em.total > 6) impactClass = 'high';
+        else if (em.total > 3) impactClass = 'medium';
+
+        let message = '';
+        if (em.total < 2) message = '🌟 Excellent! Your footprint is very low.';
+        else if (em.total < 4) message = '👍 Good! Below average impact.';
+        else if (em.total < 6) message = '📉 You\'re around average. Try to reduce.';
+        else message = '⚠️ Your footprint is high. Check suggestions.';
+
+        resultsPanel.innerHTML = `
+          <div class="total-emissions">
+            <div class="co2-number">${em.total.toFixed(2)} <span class="co2-unit">t CO₂</span></div>
+            <div class="comparison-badge">Global avg: ${avgGlobal} t</div>
+            <div class="progress-container">
+              <div class="progress-fill ${impactClass}" style="width: ${Math.min(percentOfAvg, 100)}%"></div>
+            </div>
+            <p style="font-size:1.3rem; margin-top:1rem;">${message}</p>
+          </div>
+          <div class="charts-row">
+            <div class="chart-card"><canvas id="pieChart"></canvas></div>
+            <div class="chart-card"><canvas id="barChart"></canvas></div>
+          </div>
+          <div id="suggestionsContainer" class="suggestions-grid"></div>
+        `;
+
+        // pie chart
+        if (chartPie) chartPie.destroy();
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        chartPie = new Chart(pieCtx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Transport', 'Energy', 'Lifestyle'],
+            datasets: [{
+              data: [em.transport, em.energy, em.lifestyle],
+              backgroundColor: ['#2e7d5e', '#178f8a', '#8b6e4b']
+            }]
+          }
+        });
+
+        // bar chart (comparison)
+        if (chartBar) chartBar.destroy();
+        const barCtx = document.getElementById('barChart').getContext('2d');
+        chartBar = new Chart(barCtx, {
+          type: 'bar',
+          data: {
+            labels: ['You', 'Global avg'],
+            datasets: [{
+              data: [em.total, avgGlobal],
+              backgroundColor: ['#2e7d5e', '#b6e6d9']
+            }]
+          }
+        });
+
+        // generate suggestions
+        const tips = [];
+        if (vehicleType.value !== 'electric' && vehicleType.value !== 'public' && carDist.value > 100) tips.push('🚗 Consider switching to electric or public transport to reduce transport emissions.');
+        if (!renewableToggle.checked && electricity.value > 200) tips.push('🔋 Switch to renewable energy provider to cut energy footprint.');
+        if (diet.value === 'nonveg') tips.push('🥗 Reducing meat consumption can lower your diet emissions by up to 50%.');
+        if (!recycleToggle.checked) tips.push('♻️ Start recycling to reduce waste-related emissions.');
+        if (shopping.value > 10) tips.push('🧥 Try to buy fewer new items and choose second-hand.');
+        if (flights.value > 4) tips.push('✈️ Flying less or choosing trains helps a lot.');
+
+        const tipsHtml = tips.map(t => `<div class="tip-card"><i class="fas fa-leaf"></i> ${t}</div>`).join('');
+        document.getElementById('suggestionsContainer').innerHTML = tipsHtml || '<div class="tip-card">🌍 You\'re doing great! Keep it up.</div>';
+      }
+
+      // ---------- step navigation ----------
+      function updateStep(newStep) {
+        panels.forEach(p => p.classList.remove('active-panel'));
+        steps.forEach(s => s.classList.remove('active'));
+        document.getElementById(`step${newStep}`).classList.add('active-panel');
+        steps[newStep-1].classList.add('active');
+        currentStep = newStep;
+        if (currentStep === 4) renderResults();
+      }
+
+      prevBtn.addEventListener('click', () => { if (currentStep > 1) updateStep(currentStep-1); });
+      nextBtn.addEventListener('click', () => {
+        if (currentStep < 3) updateStep(currentStep+1);
+        else if (currentStep === 3) updateStep(4); // show results
+      });
+
+      // real-time calculation (update results if step 4 active)
+      const inputs = [carDist, vehicleType, flights, electricity, renewableToggle, gas, diet, shopping, recycleToggle];
+      inputs.forEach(inp => inp.addEventListener('input', () => { if (currentStep === 4) renderResults(); }));
+
+      // reset to defaults
+      resetBtn.addEventListener('click', () => {
+        carDist.value = 150; carDistVal.innerText = '150 km';
+        vehicleType.value = 'petrol';
+        flights.value = 2;
+        electricity.value = 300; elecVal.innerText = '300 kWh';
+        renewableToggle.checked = false;
+        gas.value = 40; gasVal.innerText = '40 therms';
+        diet.value = 'nonveg';
+        shopping.value = 5; shopVal.innerText = '5 items';
+        recycleToggle.checked = true;
+        if (currentStep === 4) renderResults();
+      });
+
+      // dark mode toggle
+      themeToggle.addEventListener('click', () => document.body.classList.toggle('dark'));
+
+      // initial step
+      updateStep(1);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Math Shapes Explorer · Three.js</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: 'Inter', 'Poppins', sans-serif;
+      color: #f1f5f9;
+    }
+
+    /* UI overlay — glassmorphism panels */
+    #info-panel {
+      position: absolute;
+      top: 2rem;
+      left: 2rem;
+      background: rgba(15, 25, 45, 0.6);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      border-radius: 30px;
+      padding: 1.5rem 2rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 30px #00ffff40;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    #info-panel h1 {
+      margin: 0;
+      font-size: 2.2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #a5f0ff, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    #info-panel p {
+      margin: 0.3rem 0 0;
+      color: #cbd5e1;
+      font-size: 1rem;
+    }
+
+    #side-panel {
+      position: absolute;
+      bottom: 2rem;
+      right: 2rem;
+      width: 320px;
+      background: rgba(10, 20, 35, 0.7);
+      backdrop-filter: blur(16px);
+      border: 1px solid #38bdf8;
+      border-radius: 36px;
+      padding: 1.8rem;
+      box-shadow: 0 30px 50px #00000080, 0 0 40px #0ff;
+      transform: translateX(400px);
+      transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.3, 1);
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    #side-panel.visible {
+      transform: translateX(0);
+    }
+
+    #shape-name {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #bae6fd;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 0 15px #0ff;
+    }
+
+    #shape-desc {
+      color: #94a3b8;
+      margin-bottom: 1.5rem;
+    }
+
+    .formula-box {
+      background: rgba(0, 30, 50, 0.6);
+      border-radius: 20px;
+      padding: 1rem;
+      border-left: 6px solid #0ff;
+      margin-bottom: 1.5rem;
+    }
+
+    .formula {
+      font-family: monospace;
+      font-size: 1.2rem;
+      color: #a5f0ff;
+    }
+
+    .real-world {
+      font-size: 0.95rem;
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+
+    #controls-hint {
+      position: absolute;
+      bottom: 2rem;
+      left: 2rem;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(6px);
+      padding: 0.6rem 1.5rem;
+      border-radius: 40px;
+      border: 1px solid #38bdf8;
+      font-size: 0.9rem;
+      color: #e2e8f0;
+      z-index: 5;
+    }
+
+    #toggle-wireframe {
+      position: absolute;
+      top: 2rem;
+      right: 2rem;
+      background: rgba(0,20,40,0.7);
+      backdrop-filter: blur(8px);
+      border: 1px solid #0ff;
+      color: white;
+      padding: 0.8rem 1.8rem;
+      border-radius: 60px;
+      font-weight: 600;
+      cursor: pointer;
+      z-index: 30;
+      transition: 0.2s;
+    }
+
+    #toggle-wireframe:hover {
+      background: #0ff;
+      color: #0b1120;
+      box-shadow: 0 0 30px #0ff;
+    }
+
+    .tooltip {
+      position: absolute;
+      background: rgba(0, 255, 255, 0.2);
+      backdrop-filter: blur(4px);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      border: 1px solid #0ff;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <!-- UI overlays -->
+  <div id="info-panel">
+    <h1>⚛️ Math Shapes Explorer</h1>
+    <p>Hover to learn · Click to focus · Drag to rotate</p>
+  </div>
+
+  <div id="side-panel">
+    <div id="shape-name">Cube</div>
+    <div id="shape-desc">A symmetrical 3D square</div>
+    <div class="formula-box">
+      <div class="formula">V = a³</div>
+      <div class="formula">A = 6a²</div>
+    </div>
+    <div class="real-world" id="realWorld">Dice, boxes, building blocks</div>
+  </div>
+
+  <div id="controls-hint">
+    <i class="fas fa-mouse-pointer"></i> Drag to rotate · Scroll to zoom
+  </div>
+
+  <button id="toggle-wireframe"><i class="fas fa-border-all"></i> Toggle wireframe</button>
+
+  <!-- tooltip (hidden by default) -->
+  <div class="tooltip" id="tooltip" style="opacity:0; position:absolute;">Cube</div>
+
+  <!-- import Three.js and OrbitControls -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.126.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.126.0/examples/jsm/"
+      }
+    }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+    // --- setup scene, camera, renderer ---
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0b1120);
+    scene.fog = new THREE.FogExp2(0x0b1120, 0.002);
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(10, 6, 15);
+    camera.lookAt(0, 0, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    document.body.appendChild(renderer.domElement);
+
+    // --- controls with inertia ---
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 0.5;
+    controls.enableZoom = true;
+    controls.maxPolarAngle = Math.PI / 2;
+    controls.minDistance = 5;
+    controls.maxDistance = 30;
+
+    // --- lighting ---
+    // Ambient
+    const ambient = new THREE.AmbientLight(0x404060);
+    scene.add(ambient);
+
+    // Main directional light (simulating sun)
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    dirLight.position.set(5, 10, 7);
+    dirLight.castShadow = true;
+    dirLight.receiveShadow = true;
+    dirLight.shadow.mapSize.width = 1024;
+    dirLight.shadow.mapSize.height = 1024;
+    const d = 15;
+    dirLight.shadow.camera.left = -d;
+    dirLight.shadow.camera.right = d;
+    dirLight.shadow.camera.top = d;
+    dirLight.shadow.camera.bottom = -d;
+    dirLight.shadow.camera.near = 2;
+    dirLight.shadow.camera.far = 30;
+    scene.add(dirLight);
+
+    // Fill lights with neon colors
+    const light1 = new THREE.PointLight(0x4f46e5, 1, 30);
+    light1.position.set(-5, 3, 5);
+    scene.add(light1);
+    const light2 = new THREE.PointLight(0x06b6d4, 1, 30);
+    light2.position.set(5, 2, -5);
+    scene.add(light2);
+
+    // subtle backlight
+    const backLight = new THREE.PointLight(0x8b5cf6, 0.8);
+    backLight.position.set(-3, 1, -8);
+    scene.add(backLight);
+
+    // --- particle background (stars) ---
+    const starsGeometry = new THREE.BufferGeometry();
+    const starsCount = 2000;
+    const starsPositions = new Float32Array(starsCount * 3);
+    for (let i = 0; i < starsCount * 3; i += 3) {
+      starsPositions[i] = (Math.random() - 0.5) * 200;
+      starsPositions[i+1] = (Math.random() - 0.5) * 200;
+      starsPositions[i+2] = (Math.random() - 0.5) * 200;
+    }
+    starsGeometry.setAttribute('position', new THREE.BufferAttribute(starsPositions, 3));
+    const starsMaterial = new THREE.PointsMaterial({ color: 0xaaccff, size: 0.2, transparent: true });
+    const stars = new THREE.Points(starsGeometry, starsMaterial);
+    scene.add(stars);
+
+    // --- floating grid floor (subtle) ---
+    const gridHelper = new THREE.GridHelper(40, 20, 0x4f46e5, 0x1e293b);
+    gridHelper.position.y = -2;
+    scene.add(gridHelper);
+
+    // --- shapes data ---
+    const shapes = [];
+    const shapeNames = [
+      'Cube', 'Sphere', 'Cone', 'Cylinder', 'Torus', 'Pyramid', 'Prism',
+      'Dodecahedron', 'Icosahedron', 'Octahedron', 'Tetrahedron'
+    ];
+    
+    // create shapes with slight random offset in a circle
+    const radius = 7;
+    const count = shapeNames.length;
+    
+    // formulas and descriptions
+    const shapeInfo = {
+      Cube: { formula: 'V = a³, A = 6a²', desc: 'Six equal square faces', real: 'Dice, boxes, building blocks' },
+      Sphere: { formula: 'V = 4/3 πr³, A = 4πr²', desc: 'Perfectly round', real: 'Balls, planets, bubbles' },
+      Cone: { formula: 'V = 1/3 πr²h', desc: 'Circular base to point', real: 'Ice cream cone, funnel' },
+      Cylinder: { formula: 'V = πr²h', desc: 'Two circular faces', real: 'Cans, pipes, batteries' },
+      Torus: { formula: 'V = 2π²Rr²', desc: 'Donut shape', real: 'Donut, ring, tire' },
+      Pyramid: { formula: 'V = 1/3 lwh', desc: 'Polygonal base', real: 'Egyptian pyramids, rooftops' },
+      Prism: { formula: 'V = base area × height', desc: 'Two parallel faces', real: 'Tent, glass prism' },
+      Dodecahedron: { formula: 'V = (15+7√5)/4 a³', desc: '12 pentagonal faces', real: 'Dice, Roman dodecahedra' },
+      Icosahedron: { formula: 'V = 5(3+√5)/12 a³', desc: '20 triangular faces', real: 'Viruses, geodesic domes' },
+      Octahedron: { formula: 'V = √2/3 a³', desc: '8 triangular faces', real: 'Crystals, diamonds' },
+      Tetrahedron: { formula: 'V = a³/6√2', desc: '4 triangular faces', real: 'Pyramid, methane molecule' }
+    };
+
+    // geometry generators
+    const geoms = [
+      new THREE.BoxGeometry(1.8, 1.8, 1.8),
+      new THREE.SphereGeometry(1.3, 32, 16),
+      new THREE.ConeGeometry(1.2, 2.2, 32),
+      new THREE.CylinderGeometry(1.2, 1.2, 2.2, 32),
+      new THREE.TorusGeometry(1.1, 0.4, 16, 64),
+      new THREE.ConeGeometry(1.3, 2, 4), // pyramid
+      new THREE.CylinderGeometry(1, 1, 2.2, 6), // hexagonal prism
+      new THREE.DodecahedronGeometry(1.2),
+      new THREE.IcosahedronGeometry(1.3),
+      new THREE.OctahedronGeometry(1.4),
+      new THREE.TetrahedronGeometry(1.4)
+    ];
+
+    // material with neon glow
+    const colors = [0x38bdf8, 0x4f46e5, 0x06b6d4, 0x8b5cf6, 0xec4899, 0x14b8a6, 0xf97316, 0xa855f7, 0x3b82f6, 0x2dd4bf, 0xf43f5e];
+
+    for (let i = 0; i < count; i++) {
+      const material = new THREE.MeshPhongMaterial({
+        color: colors[i % colors.length],
+        emissive: 0x111133,
+        shininess: 30,
+        transparent: true,
+        opacity: 0.95,
+        side: THREE.DoubleSide
+      });
+      
+      const mesh = new THREE.Mesh(geoms[i], material);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      
+      // position in a circle
+      const angle = (i / count) * Math.PI * 2;
+      mesh.position.x = Math.cos(angle) * radius;
+      mesh.position.z = Math.sin(angle) * radius;
+      mesh.position.y = Math.sin(angle * 2) * 0.8 + 1; // slight variation
+      
+      mesh.userData = {
+        name: shapeNames[i],
+        formula: shapeInfo[shapeNames[i]].formula,
+        desc: shapeInfo[shapeNames[i]].desc,
+        real: shapeInfo[shapeNames[i]].real,
+        baseColor: colors[i % colors.length],
+        originalScale: 1
+      };
+      
+      scene.add(mesh);
+      shapes.push(mesh);
+    }
+
+    // add a central glowing sphere for ambiance
+    const centerGlow = new THREE.Mesh(
+      new THREE.SphereGeometry(0.5, 16, 16),
+      new THREE.MeshBasicMaterial({ color: 0x4f46e5, emissive: 0x4f46e5 })
+    );
+    scene.add(centerGlow);
+
+    // --- post-processing bloom (glow) ---
+    const renderScene = new RenderPass(scene, camera);
+    const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+    bloomPass.threshold = 0.2;
+    bloomPass.strength = 1.2;
+    bloomPass.radius = 0.5;
+
+    const composer = new EffectComposer(renderer);
+    composer.addPass(renderScene);
+    composer.addPass(bloomPass);
+
+    // --- raycasting for hover/click ---
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    const tooltip = document.getElementById('tooltip');
+    const sidePanel = document.getElementById('side-panel');
+    const shapeNameEl = document.getElementById('shape-name');
+    const shapeDescEl = document.getElementById('shape-desc');
+    const realWorldEl = document.getElementById('realWorld');
+    const formulaBox = document.querySelector('.formula-box .formula'); // will be updated
+
+    let hoveredObj = null;
+
+    function onMouseMove(event) {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(shapes);
+
+      if (intersects.length > 0) {
+        const hit = intersects[0].object;
+        tooltip.style.opacity = 1;
+        tooltip.style.left = event.clientX + 15 + 'px';
+        tooltip.style.top = event.clientY - 40 + 'px';
+        tooltip.innerText = hit.userData.name;
+
+        // scale effect
+        if (hoveredObj !== hit) {
+          if (hoveredObj) hoveredObj.scale.set(1, 1, 1);
+          hit.scale.set(1.1, 1.1, 1.1);
+          hoveredObj = hit;
+        }
+      } else {
+        tooltip.style.opacity = 0;
+        if (hoveredObj) {
+          hoveredObj.scale.set(1, 1, 1);
+          hoveredObj = null;
+        }
+      }
+    }
+
+    function onClick(event) {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(shapes);
+
+      if (intersects.length > 0) {
+        const hit = intersects[0].object;
+        // focus camera on object
+        controls.target.copy(hit.position);
+        controls.update();
+
+        // update side panel
+        shapeNameEl.innerText = hit.userData.name;
+        shapeDescEl.innerText = hit.userData.desc;
+        realWorldEl.innerText = hit.userData.real;
+        // update formula (simplified)
+        const formulaDivs = document.querySelectorAll('.formula');
+        if (formulaDivs.length >= 2) {
+          formulaDivs[0].innerText = hit.userData.formula.split(',')[0];
+          formulaDivs[1].innerText = hit.userData.formula.split(',')[1] || '';
+        }
+        sidePanel.classList.add('visible');
+      }
+    }
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('click', onClick);
+
+    // wireframe toggle
+    let wireframeMode = false;
+    document.getElementById('toggle-wireframe').addEventListener('click', () => {
+      wireframeMode = !wireframeMode;
+      shapes.forEach(shape => {
+        shape.material.wireframe = wireframeMode;
+      });
+    });
+
+    // auto-rotate toggle on demand (optional)
+    // but we already have controls.autoRotate = true
+
+    // --- animation loop ---
+    function animate() {
+      requestAnimationFrame(animate);
+
+      // slight floating animation
+      shapes.forEach((shape, idx) => {
+        shape.rotation.y += 0.005;
+        shape.rotation.x += 0.002;
+        shape.position.y += Math.sin(Date.now() * 0.002 + idx) * 0.002;
+      });
+
+      stars.rotation.y += 0.0002;
+
+      controls.update(); // for damping and auto-rotate
+
+      composer.render();
+    }
+
+    animate();
+
+    // handle resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      composer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // tooltip styling
+  </script>
+  <!-- font awesome for icons (optional) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</body>
+</html>

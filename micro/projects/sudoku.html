@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SUDOKU • SOLVER</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --bg-gradient-1: #141E30;
+            --bg-gradient-2: #243B55;
+            --panel-bg: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.15);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --accent-color: #00E5FF;
+            --success-color: #00ff88;
+            --error-color: #ff4d4d;
+            --fixed-cell: #2c3e50;
+            --testing-cell: #f39c12;
+            --correct-cell: #27ae60;
+            --grid-border: rgba(255, 255, 255, 0.3);
+            --cell-border: rgba(255, 255, 255, 0.1);
+            --border-glow: rgba(0, 229, 255, 0.5);
+            --shadow-neon: 0 0 20px #00E5FF;
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, var(--bg-gradient-1), var(--bg-gradient-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            position: relative;
+            overflow-x: hidden;
+            animation: gradientMove 15s ease infinite;
+            background-size: 400% 400%;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Main container */
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            box-shadow: 0 30px 60px -15px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 10;
+            border: 1px solid rgba(255,255,255,0.1);
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.3rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--card-bg);
+            border-radius: 3rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid var(--accent-color);
+            color: var(--text-primary);
+            padding: 0.8rem 1.5rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: var(--accent-color);
+            color: var(--bg-gradient-1);
+            box-shadow: var(--shadow-neon);
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: var(--bg-gradient-1);
+        }
+
+        .btn-success {
+            border-color: var(--success-color);
+        }
+
+        .btn-success:hover {
+            background: var(--success-color);
+        }
+
+        /* Speed Control */
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(255,255,255,0.1);
+            padding: 0.5rem 1.5rem;
+            border-radius: 3rem;
+        }
+
+        .speed-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .speed-slider {
+            width: 120px;
+            height: 4px;
+            -webkit-appearance: none;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+            outline: none;
+        }
+
+        .speed-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            border: 2px solid white;
+        }
+
+        .speed-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: var(--shadow-neon);
+        }
+
+        .speed-value {
+            color: var(--accent-color);
+            font-weight: 600;
+            min-width: 45px;
+        }
+
+        /* Stats Panel */
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--card-bg);
+            border-radius: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 0.8rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 1.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-value {
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-unit {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-left: 0.2rem;
+        }
+
+        /* Sudoku Grid */
+        .grid-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--card-bg);
+            border-radius: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sudoku-grid {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 2px;
+            background: var(--grid-border);
+            padding: 2px;
+            border-radius: 8px;
+            width: fit-content;
+            max-width: 100%;
+            overflow-x: auto;
+        }
+
+        .cell {
+            width: 50px;
+            height: 50px;
+            background: var(--fixed-cell);
+            border: 1px solid var(--cell-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        /* 3x3 sub-grid borders */
+        .cell:nth-child(3n) {
+            border-right: 2px solid var(--accent-color);
+        }
+        
+        .cell:nth-child(9n) {
+            border-right: 1px solid var(--cell-border);
+        }
+        
+        .cell:nth-child(n+19):nth-child(-n+27),
+        .cell:nth-child(n+46):nth-child(-n+54) {
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        .cell input {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: none;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            outline: none;
+        }
+
+        .cell input::-webkit-outer-spin-button,
+        .cell input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .cell input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .cell.fixed {
+            background: var(--fixed-cell);
+        }
+
+        .cell.testing {
+            background: var(--testing-cell);
+            animation: pulse 1s infinite;
+        }
+
+        .cell.correct {
+            background: var(--success-color);
+            animation: correctPulse 0.5s ease;
+        }
+
+        .cell.error {
+            background: var(--error-color);
+            animation: shake 0.5s ease;
+        }
+
+        .cell.highlight {
+            box-shadow: 0 0 20px var(--accent-color);
+            z-index: 10;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(0.9); opacity: 0.5; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        /* Error Message */
+        .error-message {
+            color: var(--error-color);
+            text-align: center;
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            background: rgba(255, 77, 77, 0.1);
+            border-radius: 2rem;
+            border: 1px solid var(--error-color);
+            animation: shake 0.5s ease;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .title { font-size: 1.8rem; }
+            .cell { width: 35px; height: 35px; font-size: 1rem; }
+            .cell input { font-size: 1rem; }
+            .btn { padding: 0.6rem 1rem; font-size: 0.8rem; }
+        }
+
+        @media (max-width: 480px) {
+            .cell { width: 30px; height: 30px; }
+            .control-panel { flex-direction: column; }
+            .btn-group { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">SUDOKU SOLVER</div>
+            <div class="subtitle">BACKTRACKING • VISUALIZED</div>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <div class="btn-group">
+                <button class="btn btn-primary" id="solveBtn">▶ Solve</button>
+                <button class="btn" id="resetBtn">🔄 Reset</button>
+                <button class="btn" id="clearBtn">🗑️ Clear</button>
+                <button class="btn" id="randomBtn">🎲 Random</button>
+            </div>
+            
+            <div class="speed-control">
+                <span class="speed-label">⚡ Speed</span>
+                <input type="range" class="speed-slider" id="speedSlider" min="1" max="100" value="50">
+                <span class="speed-value" id="speedValue">50</span>
+            </div>
+        </div>
+
+        <!-- Stats Panel -->
+        <div class="stats-panel">
+            <div class="stat-item">
+                <div class="stat-label">Time</div>
+                <div class="stat-value" id="timeTaken">0<span class="stat-unit">ms</span></div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Steps</div>
+                <div class="stat-value" id="stepsCount">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Backtracks</div>
+                <div class="stat-value" id="backtracksCount">0</div>
+            </div>
+        </div>
+
+        <!-- Sudoku Grid -->
+        <div class="grid-container">
+            <div class="sudoku-grid" id="sudokuGrid"></div>
+        </div>
+
+        <!-- Error Display -->
+        <div id="errorDisplay" style="display: none;"></div>
+
+        <div class="footer">
+            ⚡ Watch backtracking find the solution in real-time
+        </div>
+    </div>
+
+    <script>
+        // ========== GLOBAL VARIABLES ==========
+        const GRID_SIZE = 9;
+        let board = [];
+        let originalBoard = [];
+        let isSolving = false;
+        let steps = 0;
+        let backtracks = 0;
+        let speed = 50;
+
+        // DOM Elements
+        const sudokuGrid = document.getElementById('sudokuGrid');
+        const solveBtn = document.getElementById('solveBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const randomBtn = document.getElementById('randomBtn');
+        const speedSlider = document.getElementById('speedSlider');
+        const speedValue = document.getElementById('speedValue');
+        const timeTaken = document.getElementById('timeTaken');
+        const stepsCount = document.getElementById('stepsCount');
+        const backtracksCount = document.getElementById('backtracksCount');
+        const errorDisplay = document.getElementById('errorDisplay');
+
+        // Sample puzzles
+        const puzzles = [
+            // Easy
+            [
+                [5,3,0,0,7,0,0,0,0],
+                [6,0,0,1,9,5,0,0,0],
+                [0,9,8,0,0,0,0,6,0],
+                [8,0,0,0,6,0,0,0,3],
+                [4,0,0,8,0,3,0,0,1],
+                [7,0,0,0,2,0,0,0,6],
+                [0,6,0,0,0,0,2,8,0],
+                [0,0,0,4,1,9,0,0,5],
+                [0,0,0,0,8,0,0,7,9]
+            ],
+            // Medium
+            [
+                [0,0,4,0,5,0,0,0,0],
+                [9,0,0,7,3,4,6,0,0],
+                [0,0,3,0,2,1,0,4,9],
+                [0,3,5,0,9,0,4,8,0],
+                [6,0,0,5,0,2,0,0,7],
+                [0,7,9,0,4,0,1,6,0],
+                [3,6,0,1,7,0,9,0,0],
+                [0,0,7,3,8,9,0,0,5],
+                [0,0,0,0,6,0,2,0,0]
+            ],
+            // Hard
+            [
+                [0,0,0,6,0,0,4,0,0],
+                [7,0,0,0,0,3,6,0,0],
+                [0,4,0,9,0,0,0,1,2],
+                [0,9,8,0,7,0,0,0,6],
+                [1,0,0,8,0,2,0,0,3],
+                [6,0,0,0,9,0,7,2,0],
+                [9,7,0,0,0,8,0,3,0],
+                [0,0,3,7,0,0,0,0,5],
+                [0,0,5,0,0,9,0,0,0]
+            ]
+        ];
+
+        // ========== BOARD INITIALIZATION ==========
+        function createBoard() {
+            sudokuGrid.innerHTML = '';
+            board = Array(GRID_SIZE).fill().map(() => Array(GRID_SIZE).fill(0));
+            
+            for (let i = 0; i < GRID_SIZE; i++) {
+                for (let j = 0; j < GRID_SIZE; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell fixed';
+                    cell.dataset.row = i;
+                    cell.dataset.col = j;
+                    
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.min = 1;
+                    input.max = 9;
+                    input.addEventListener('input', handleCellInput);
+                    
+                    cell.appendChild(input);
+                    sudokuGrid.appendChild(cell);
+                }
+            }
+        }
+
+        function handleCellInput(e) {
+            if (isSolving) return;
+            
+            const input = e.target;
+            const cell = input.parentElement;
+            const row = parseInt(cell.dataset.row);
+            const col = parseInt(cell.dataset.col);
+            const value = input.value ? parseInt(input.value) : 0;
+            
+            if (value >= 1 && value <= 9) {
+                board[row][col] = value;
+                cell.classList.add('fixed');
+            } else {
+                board[row][col] = 0;
+                cell.classList.remove('fixed');
+            }
+        }
+
+        function updateBoardFromUI() {
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach(cell => {
+                const row = parseInt(cell.dataset.row);
+                const col = parseInt(cell.dataset.col);
+                const input = cell.querySelector('input');
+                const value = input.value ? parseInt(input.value) : 0;
+                
+                if (value >= 1 && value <= 9) {
+                    board[row][col] = value;
+                } else {
+                    board[row][col] = 0;
+                }
+            });
+        }
+
+        function updateUIFromBoard() {
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach(cell => {
+                const row = parseInt(cell.dataset.row);
+                const col = parseInt(cell.dataset.col);
+                const input = cell.querySelector('input');
+                const value = board[row][col];
+                
+                input.value = value !== 0 ? value : '';
+                cell.classList.remove('testing', 'correct', 'error', 'highlight');
+                if (value !== 0) {
+                    cell.classList.add('fixed');
+                } else {
+                    cell.classList.remove('fixed');
+                }
+            });
+        }
+
+        // ========== VALIDATION ==========
+        function isValid(board, row, col, num) {
+            // Check row
+            for (let x = 0; x < GRID_SIZE; x++) {
+                if (board[row][x] === num && x !== col) return false;
+            }
+            
+            // Check column
+            for (let x = 0; x < GRID_SIZE; x++) {
+                if (board[x][col] === num && x !== row) return false;
+            }
+            
+            // Check 3x3 box
+            const boxRow = Math.floor(row / 3) * 3;
+            const boxCol = Math.floor(col / 3) * 3;
+            
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    const r = boxRow + i;
+                    const c = boxCol + j;
+                    if (board[r][c] === num && r !== row && c !== col) return false;
+                }
+            }
+            
+            return true;
+        }
+
+        // ========== VISUALIZATION HELPERS ==========
+        async function highlightCell(row, col, className) {
+            const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+            if (cell) {
+                cell.classList.add(className);
+                await sleep(getDelay());
+                if (className !== 'correct' && className !== 'error') {
+                    cell.classList.remove(className);
+                }
+            }
+        }
+
+        function getDelay() {
+            // Convert speed (1-100) to delay (200ms - 10ms)
+            return Math.max(10, 200 - (speed * 1.8));
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // ========== BACKTRACKING SOLVER ==========
+        async function solveSudoku(board) {
+            for (let row = 0; row < GRID_SIZE; row++) {
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    if (board[row][col] === 0) {
+                        for (let num = 1; num <= 9; num++) {
+                            steps++;
+                            stepsCount.textContent = steps;
+                            
+                            // Highlight testing cell
+                            await highlightCell(row, col, 'testing');
+                            
+                            if (isValid(board, row, col, num)) {
+                                board[row][col] = num;
+                                
+                                // Update UI
+                                const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+                                cell.querySelector('input').value = num;
+                                await highlightCell(row, col, 'correct');
+                                
+                                if (await solveSudoku(board)) {
+                                    return true;
+                                }
+                                
+                                // Backtrack
+                                backtracks++;
+                                backtracksCount.textContent = backtracks;
+                                
+                                board[row][col] = 0;
+                                cell.querySelector('input').value = '';
+                                await highlightCell(row, col, 'error');
+                            }
+                        }
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        // ========== CONTROL FUNCTIONS ==========
+        async function solve() {
+            if (isSolving) return;
+            
+            // Save original board for reset
+            updateBoardFromUI();
+            originalBoard = board.map(row => [...row]);
+            
+            isSolving = true;
+            steps = 0;
+            backtracks = 0;
+            stepsCount.textContent = steps;
+            backtracksCount.textContent = backtracks;
+            
+            disableButtons(true);
+            hideError();
+            
+            const startTime = performance.now();
+            
+            const solved = await solveSudoku(board);
+            
+            const endTime = performance.now();
+            timeTaken.textContent = (endTime - startTime).toFixed(0);
+            
+            if (!solved) {
+                showError('No solution exists for this puzzle!');
+            }
+            
+            isSolving = false;
+            disableButtons(false);
+        }
+
+        function resetBoard() {
+            if (isSolving) return;
+            
+            board = originalBoard.map(row => [...row]);
+            updateUIFromBoard();
+            timeTaken.textContent = '0';
+            stepsCount.textContent = '0';
+            backtracksCount.textContent = '0';
+            hideError();
+        }
+
+        function clearBoard() {
+            if (isSolving) return;
+            
+            board = Array(GRID_SIZE).fill().map(() => Array(GRID_SIZE).fill(0));
+            originalBoard = board.map(row => [...row]);
+            updateUIFromBoard();
+            timeTaken.textContent = '0';
+            stepsCount.textContent = '0';
+            backtracksCount.textContent = '0';
+            hideError();
+        }
+
+        function loadRandomPuzzle() {
+            if (isSolving) return;
+            
+            const randomIndex = Math.floor(Math.random() * puzzles.length);
+            board = puzzles[randomIndex].map(row => [...row]);
+            originalBoard = board.map(row => [...row]);
+            updateUIFromBoard();
+            timeTaken.textContent = '0';
+            stepsCount.textContent = '0';
+            backtracksCount.textContent = '0';
+            hideError();
+        }
+
+        function disableButtons(disable) {
+            solveBtn.disabled = disable;
+            resetBtn.disabled = disable;
+            clearBtn.disabled = disable;
+            randomBtn.disabled = disable;
+            speedSlider.disabled = disable;
+        }
+
+        // ========== ERROR HANDLING ==========
+        function showError(message) {
+            errorDisplay.style.display = 'block';
+            errorDisplay.className = 'error-message';
+            errorDisplay.textContent = `⚠️ ${message}`;
+        }
+
+        function hideError() {
+            errorDisplay.style.display = 'none';
+        }
+
+        // ========== EVENT LISTENERS ==========
+        solveBtn.addEventListener('click', solve);
+        resetBtn.addEventListener('click', resetBoard);
+        clearBtn.addEventListener('click', clearBoard);
+        randomBtn.addEventListener('click', loadRandomPuzzle);
+
+        speedSlider.addEventListener('input', (e) => {
+            speed = parseInt(e.target.value);
+            speedValue.textContent = speed;
+        });
+
+        // Initialize
+        createBoard();
+        loadRandomPuzzle();
+    </script>
+</body>
+</html>
