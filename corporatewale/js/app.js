@@ -40,7 +40,7 @@
         setTimeout(hideLoader, 5000);
     }
 
-    // ===== NAVIGATION SETUP (FIXED) =====
+    // ===== SIMPLE NAVIGATION =====
     function setupNav() {
         // Hamburger menu toggle
         if (hamburger) {
@@ -49,23 +49,20 @@
             });
         }
         
-        // Navigation links
+        // Navigation links - SIMPLE, no blocking
         document.querySelectorAll('.nav-link').forEach(function(link) {
             link.addEventListener('click', function(e) {
-                // Check if it's a normal link (has href and not #)
-                const href = this.getAttribute('href');
-                if (href && href !== '#' && href !== '' && !href.startsWith('#')) {
-                    // Let browser handle navigation
-                    return;
-                }
-                
-                e.preventDefault();
-                if (this.dataset.section === 'player') {
-                    const playerSection = document.getElementById('playerSection');
-                    if (playerSection) {
-                        playerSection.scrollIntoView({ behavior: 'smooth' });
+                // Only prevent default for # links
+                if (this.getAttribute('href') === '#') {
+                    e.preventDefault();
+                    if (this.dataset.section === 'player') {
+                        const playerSection = document.getElementById('playerSection');
+                        if (playerSection) {
+                            playerSection.scrollIntoView({ behavior: 'smooth' });
+                        }
                     }
                 }
+                // For normal links (index.html, bhojpuri.html) - do nothing, let browser handle
                 if (nav) nav.classList.remove('open');
             });
         });
