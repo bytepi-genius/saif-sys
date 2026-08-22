@@ -841,6 +841,9 @@
         </div>
     </div>
 
+
+
+    
     <!-- MINI PLAYER -->
     <div id="miniPlayer" class="mini-player hidden">
         <div class="mini-player-content">
@@ -872,6 +875,18 @@
             </span>
         </div>
 
+<!-- HEADER -->
+<header class="header">
+    <div class="logo">🏢 CORPORATE<span>WALE</span></div>
+    <nav class="nav" id="mainNav">
+        <a href="index.html" class="nav-link active" onclick="window.location.href='index.html'">Hindi</a>
+        <a href="bhojpuri.html" class="nav-link" onclick="window.location.href='bhojpuri.html'">Bhojpuri</a>
+        <a href="#playerSection" class="nav-link" data-section="player">Now Playing</a>
+    </nav>
+    <button class="hamburger" id="hamburger"><i class="fas fa-bars"></i></button>
+</header>
+    
+
         <!-- HERO -->
         <section class="hero-section" id="homeSection">
             <div class="hero-content">
@@ -881,6 +896,7 @@
                 <button class="hero-btn" id="exploreBtn"><i class="fas fa-music"></i> Start Listening</button>
             </div>
         </section>
+        
 
         <!-- BACKGROUND TOGGLE -->
         <div class="bg-toggle-wrap">
@@ -1238,15 +1254,37 @@
                     updatePlayButton();
                     waveform.classList.add('paused');
                 });
-                audio.addEventListener('ended', function() {
-                    if (isChanging) return;
-                    if (repeatMode === 1) {
-                        audio.currentTime = 0;
-                        audio.play().catch(function() {});
-                    } else {
-                        setTimeout(function() { nextSong(); }, 500);
-                    }
-                });
+               // ===== REPLACE THIS SECTION =====
+audio.addEventListener('ended', function() {
+    if (isChanging) return;
+    console.log('⏹️ Song ended, playing next...');
+    
+    if (repeatMode === 1) {
+        // Repeat One
+        audio.currentTime = 0;
+        audio.play().catch(function() {});
+        console.log('🔁 Repeating current song');
+    } else {
+        // Play next song
+        setTimeout(function() {
+            // Get next index
+            let nextIdx;
+            if (randomMode) {
+                let attempts = 0;
+                do {
+                    nextIdx = Math.floor(Math.random() * songs.length);
+                    attempts++;
+                } while (nextIdx === currentIndex && songs.length > 1 && attempts < 10);
+            } else {
+                nextIdx = currentIndex + 1;
+                if (nextIdx >= songs.length) nextIdx = 0;
+            }
+            
+            // Load and auto-play next song
+            loadSong(nextIdx, true);
+        }, 500);
+    }
+});
                 audio.addEventListener('error', function(e) {
                     console.warn('⚠️ Audio error:', e);
                     if (!isChanging) setTimeout(function() { nextSong(); }, 500);

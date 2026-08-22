@@ -38,18 +38,25 @@
         setTimeout(hideLoader, 5000);
     }
 
-    function setupNav() {
-        hamburger.addEventListener('click', function() { nav.classList.toggle('open'); });
-        document.querySelectorAll('.nav-link').forEach(function(link) {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                if (this.dataset.section === 'player') {
-                    document.getElementById('playerSection').scrollIntoView({ behavior: 'smooth' });
-                }
-                nav.classList.remove('open');
-            });
+   function setupNav() {
+    hamburger.addEventListener('click', function() { nav.classList.toggle('open'); });
+    
+    document.querySelectorAll('.nav-link').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            // Allow normal navigation for external links
+            if (this.getAttribute('href') && this.getAttribute('href') !== '#') {
+                // Let the browser handle the navigation
+                return;
+            }
+            
+            e.preventDefault();
+            if (this.dataset.section === 'player') {
+                document.getElementById('playerSection').scrollIntoView({ behavior: 'smooth' });
+            }
+            nav.classList.remove('open');
         });
-    }
+    });
+}
 
     function setupExploreBtn() {
         exploreBtn.addEventListener('click', function() {

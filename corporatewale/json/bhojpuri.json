@@ -1,0 +1,99 @@
+{
+  "songs": [
+    {
+      "id": 1,
+      "title": "Lollypop",
+      "artist": "Pawan Singh",
+      "file": "audio/bhojpuri/lollypop.mp3",
+      "description": "A high-energy Bhojpuri track to boost your work mood."
+    },
+    {
+      "id": 2,
+      "title": "Lal Ghaghra",
+      "artist": "Pawan Singh",
+      "file": "audio/bhojpuri/Lal Ghaghra.mp3",
+      "description": "A fun and upbeat Bhojpuri song for creative work."
+    },
+    {
+      "id": 3,
+      "title": "Chhalakata Hamro Jawaniya",
+      "artist": "Pawan Singh",
+      "file": "audio/bhojpuri/Chhalakata Hamro Jawaniya.mp3",
+      "description": "A romantic Bhojpuri track for peaceful work environment."
+    },
+    {
+      "id": 4,
+      "title": "Sarso Ke Sagiya",
+      "artist": "Khesari Lal Yadav",
+      "file": "audio/bhojpuri/Sarso Ke Sagiya.mp3",
+      "description": "An energetic Bhojpuri song to keep you motivated."
+    },
+    {
+      "id": 5,
+      "title": "Sutala Tani Kora Mein",
+      "artist": "Khesari Lal Yadav",
+      "file": "audio/bhojpuri/Sutala Tani Kora Mein.mp3",
+      "description": "A soulful Bhojpuri melody for relaxed work."
+    },
+    {
+      "id": 6,
+      "title": "Cooler Kurti Me Laga La",
+      "artist": "Khesari Lal Yadav",
+      "file": "audio/bhojpuri/Cooler Kurti Me Laga La.mp3",
+      "description": "A soothing Bhojpuri track for focused work hours."
+    },
+    {
+      "id": 7,
+      "title": "Saj Ke Sawar Ke",
+      "artist": "Khesari Lal Yadav",
+      "file": "audio/bhojpuri/Saj Ke Sawar Ke.mp3",
+      "description": "A refreshing Bhojpuri mashup for positive work atmosphere."
+    },
+    {
+      "id": 8,
+      "title": "Top - 10-Bhojupri Bewafai",
+      "artist": "Pawan Singh",
+      "file": "audio/bhojpuri/Top - 10-Bhojupri Bewafai.mp3",
+      "description": "A romantic Bhojpuri song for quiet moments."
+    },
+    {
+      "id": 9,
+      "title": "Babuan",
+      "artist": "Pawan Singh",
+      "file": "audio/bhojpuri/babuan.mp3",
+      "description": "A romantic Bhojpuri song for quiet moments."
+    },
+    {
+      "id": 10,
+      "title": "Balamuwa ke Ballam",
+      "artist": "Samar Singh",
+      "file": "audio/bhojpuri/Balamuwa Ke Ballam.mp3",
+      "description": "A romantic Bhojpuri song for quiet moments."
+    },
+    {
+        "id":11,
+        "title":"Chali Samiyana",
+        "artist":"Arbind Akela",
+        "file":"audio/bhojpuri/Chali Samiyana.mp3",
+        "description":"A fun and upbeat Bhojpuri song for creative work."
+    },{
+        "id":12,
+        "title":"BEHIYA KE HAAR NA PAIBUE",
+        "artist":"Radhe Shyam Rashiya",
+        "file":"audio/bhojpuri/BEHIYA KE HAAR NA PAIBUE.mp3",
+        "description":"A fun and upbeat Bhojpuri song for creative work."
+    },{
+        "id":13,
+        "title":"Raja Jee Ke Korave Me Javaan",
+        "artist":"Radhe Shyam Rashiya",
+        "file":"audio/bhojpuri/Raja Jee Ke Korave Me Javaan.mp3",
+        "description":"A fun and upbeat Bhojpuri song for creative work."
+    },{
+        "id":14,
+        "title":"Top-10-Sadabahar Chaita Gana",
+        "artist":"Khesari+Pawan",
+        "file":"audio/bhojpuri/Top-10-Sadabahar Chaita Gana.mp3",
+        "description":"A fun and upbeat Bhojpuri song for creative work."
+    }
+  ]
+}
