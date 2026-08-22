@@ -10,7 +10,9 @@
     const nav = document.getElementById('mainNav');
     const exploreBtn = document.getElementById('exploreBtn');
 
-    function hideLoader() { loader.classList.add('hide'); }
+    function hideLoader() { 
+        if (loader) loader.classList.add('hide'); 
+    }
 
     function init() {
         console.log('🚀 CorporateWale initializing...');
@@ -38,40 +40,56 @@
         setTimeout(hideLoader, 5000);
     }
 
-   function setupNav() {
-    hamburger.addEventListener('click', function() { nav.classList.toggle('open'); });
-    
-    document.querySelectorAll('.nav-link').forEach(function(link) {
-        link.addEventListener('click', function(e) {
-            // Allow normal navigation for external links
-            if (this.getAttribute('href') && this.getAttribute('href') !== '#') {
-                // Let the browser handle the navigation
-                return;
-            }
-            
-            e.preventDefault();
-            if (this.dataset.section === 'player') {
-                document.getElementById('playerSection').scrollIntoView({ behavior: 'smooth' });
-            }
-            nav.classList.remove('open');
-        });
-    });
-}
-
-    function setupExploreBtn() {
-        exploreBtn.addEventListener('click', function() {
-            document.getElementById('playerSection').scrollIntoView({ behavior: 'smooth' });
-            if (window.Player) {
-                const currentSong = window.Player.getCurrentSong();
-                if (!currentSong) {
-                    window.Player.loadSong(0);
+    // ===== NAVIGATION SETUP (FIXED) =====
+    function setupNav() {
+        // Hamburger menu toggle
+        if (hamburger) {
+            hamburger.addEventListener('click', function() { 
+                nav.classList.toggle('open'); 
+            });
+        }
+        
+        // Navigation links
+        document.querySelectorAll('.nav-link').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                // Check if it's a normal link (has href and not #)
+                const href = this.getAttribute('href');
+                if (href && href !== '#' && href !== '' && !href.startsWith('#')) {
+                    // Let browser handle navigation
+                    return;
                 }
-                // ✅ Play the song
-                setTimeout(function() {
-                    window.Player.togglePlay();
-                }, 300);
-            }
+                
+                e.preventDefault();
+                if (this.dataset.section === 'player') {
+                    const playerSection = document.getElementById('playerSection');
+                    if (playerSection) {
+                        playerSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }
+                if (nav) nav.classList.remove('open');
+            });
         });
+    }
+
+    // ===== EXPLORE BUTTON =====
+    function setupExploreBtn() {
+        if (exploreBtn) {
+            exploreBtn.addEventListener('click', function() {
+                const playerSection = document.getElementById('playerSection');
+                if (playerSection) {
+                    playerSection.scrollIntoView({ behavior: 'smooth' });
+                }
+                if (window.Player) {
+                    const currentSong = window.Player.getCurrentSong();
+                    if (!currentSong) {
+                        window.Player.loadSong(0);
+                    }
+                    setTimeout(function() {
+                        window.Player.togglePlay();
+                    }, 300);
+                }
+            });
+        }
     }
 
     document.addEventListener('DOMContentLoaded', init);
