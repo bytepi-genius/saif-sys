@@ -50,13 +50,6 @@
       "description": "A refreshing Bhojpuri mashup for positive work atmosphere."
     },
     {
-      "id": 8,
-      "title": "Top - 10-Bhojupri Bewafai",
-      "artist": "Pawan Singh",
-      "file": "audio/bhojpuri/Top - 10-Bhojupri Bewafai.mp3",
-      "description": "A romantic Bhojpuri song for quiet moments."
-    },
-    {
       "id": 9,
       "title": "Babuan",
       "artist": "Pawan Singh",
@@ -87,12 +80,6 @@
         "title":"Raja Jee Ke Korave Me Javaan",
         "artist":"Radhe Shyam Rashiya",
         "file":"audio/bhojpuri/Raja Jee Ke Korave Me Javaan.mp3",
-        "description":"A fun and upbeat Bhojpuri song for creative work."
-    },{
-        "id":14,
-        "title":"Top-10-Sadabahar Chaita Gana",
-        "artist":"Khesari+Pawan",
-        "file":"audio/bhojpuri/Top-10-Sadabahar Chaita Gana.mp3",
         "description":"A fun and upbeat Bhojpuri song for creative work."
     }
   ]
