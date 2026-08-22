@@ -167,6 +167,48 @@
       "artist": "Sunidhi Chauhan",
       "file": "audio/Sheila Ki Jawani-jubin.mp3",
       "description": "A high-energy track for deadline work."
+    },
+    {
+      "id": 19,
+      "title": "Kesariya",
+      "artist": "Arijit Singh",
+      "file": "audio/Kesariya Brahmāstra- Arijit.mp3",
+      "description": "A romantic track for peaceful work environment."
+    },
+    {
+      "id": 20,
+      "title": "Satranga",
+      "artist": "Arijit Singh",
+      "file": "audio/Satranga.mp3",
+      "description": "A refreshing song for positive work atmosphere."
+    },
+    {
+      "id": 21,
+      "title": "Sajni",
+      "artist": "Arijit Singh",
+      "file": "audio/sajni.mp3",
+      "description": "A calm melody for relaxed work."
+    },
+    {
+      "id": 22,
+      "title": "Apna Bana Le",
+      "artist": "Arijit Singh",
+      "file": "audio/Apna Bana Le-arijit.mp3",
+      "description": "A thoughtful song for quiet work moments."
+    },
+    {
+      "id": 23,
+      "title": "O Maahi",
+      "artist": "Arijit Singh",
+      "file": "audio/O mahi.mp3",
+      "description": "A refreshing song for work playlist."
+    },
+    {
+      "id": 24,
+      "title": "Ae Dil Hai Mushkil",
+      "artist": "Arijit Singh",
+      "file": "audio/Ae Dil Hai Mushkil-arijit.mp3",
+      "description": "A soulful song for creative work sessions."
     }
   ]
 }
