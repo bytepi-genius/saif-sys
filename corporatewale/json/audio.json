@@ -85,13 +85,6 @@
       "description": "A soulful romantic track for late-night work sessions."
     },
     {
-      "id": 7,
-      "title": "Tum Hi Aana",
-      "artist": "Jubin Nautiyal",
-      "file": "audio/Tum hi ana-Jubin.mp3",
-      "description": "An emotional song for those quiet corporate moments."
-    },
-    {
       "id": 8,
       "title": "Raataan Lambiyan",
       "artist": "Jubin Nautiyal",
@@ -104,13 +97,6 @@
       "artist": "Jubin Nautiyal",
       "file": "audio/Barbaad-Jubin Nautiyal.mp3",
       "description": "A soulful melody for creative work sessions."
-    },
-    {
-      "id": 10,
-      "title": "Tujhe Kitna Chahein Aur",
-      "artist": "Jubin Nautiyal",
-      "file": "audio/Tujhe Kitna Chahein Aur-jubin.mp3",
-      "description": "A romantic track for peaceful work environment."
     },
     {
       "id": 11,
@@ -134,13 +120,6 @@
       "description": "A soothing melody for focused work hours."
     },
     {
-      "id": 14,
-      "title": "Saath Hum Rahein",
-      "artist": "Jubin Nautiyal",
-      "file": "audio/Saath Hum rahein-Jubin.mp3",
-      "description": "A refreshing song for positive work atmosphere."
-    },
-    {
       "id": 15,
       "title": "Meri Aashiqui",
       "artist": "Jubin Nautiyal",
@@ -162,13 +141,6 @@
       "description": "A fun and upbeat track for creative work."
     },
     {
-      "id": 18,
-      "title": "Sheila Ki Jawani",
-      "artist": "Sunidhi Chauhan",
-      "file": "audio/Sheila Ki Jawani-jubin.mp3",
-      "description": "A high-energy track for deadline work."
-    },
-    {
       "id": 19,
       "title": "Kesariya",
       "artist": "Arijit Singh",
@@ -181,34 +153,7 @@
       "artist": "Arijit Singh",
       "file": "audio/Satranga.mp3",
       "description": "A refreshing song for positive work atmosphere."
-    },
-    {
-      "id": 21,
-      "title": "Sajni",
-      "artist": "Arijit Singh",
-      "file": "audio/sajni.mp3",
-      "description": "A calm melody for relaxed work."
-    },
-    {
-      "id": 22,
-      "title": "Apna Bana Le",
-      "artist": "Arijit Singh",
-      "file": "audio/Apna Bana Le-arijit.mp3",
-      "description": "A thoughtful song for quiet work moments."
-    },
-    {
-      "id": 23,
-      "title": "O Maahi",
-      "artist": "Arijit Singh",
-      "file": "audio/O mahi.mp3",
-      "description": "A refreshing song for work playlist."
-    },
-    {
-      "id": 24,
-      "title": "Ae Dil Hai Mushkil",
-      "artist": "Arijit Singh",
-      "file": "audio/Ae Dil Hai Mushkil-arijit.mp3",
-      "description": "A soulful song for creative work sessions."
+    
     }
   ]
 }
