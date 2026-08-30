@@ -1,0 +1,64 @@
+{
+  "backgrounds": [
+    {
+      "id": "tamil-temple",
+      "name": "Tamil Temple",
+      "image": "background/tamil/tamil-temple.png",
+      "description": "Ancient Tamil temple architecture with Dravidian style."
+    },
+    {
+      "id": "tamil-beach",
+      "name": "Tamil Beach",
+      "image": "background/tamil/tamil-beach.png",
+      "description": "Beautiful sunrise at Marina Beach, Chennai."
+    },
+    {
+      "id": "tamil-rice-field",
+      "name": "Tamil Rice Field",
+      "image": "background/tamil/tamil-rice-field.png",
+      "description": "Vibrant green paddy fields of Tamil Nadu."
+    },
+    {
+      "id": "tamil-temple-car",
+      "name": "Tamil Temple Car",
+      "image": "background/tamil/tamil-temple-car.png",
+      "description": "Traditional temple car (Ther) during festival."
+    },
+    {
+      "id": "tamil-kutcheri",
+      "name": "Tamil Kutcheri",
+      "image": "background/tamil/tamil-kutcheri.png",
+      "description": "Classical Carnatic music concert (Kutcheri)."
+    },
+    {
+      "id": "tamil-bharatanatyam",
+      "name": "Bharatanatyam",
+      "image": "background/tamil/tamil-bharatanatyam.png",
+      "description": "Classical Bharatanatyam dance performance."
+    },
+    {
+      "id": "tamil-meenakshi",
+      "name": "Meenakshi Temple",
+      "image": "background/tamil/tamil-meenakshi.png",
+      "description": "The famous Meenakshi Amman Temple, Madurai."
+    },
+    {
+      "id": "tamil-ooty",
+      "name": "Ooty Hills",
+      "image": "background/tamil/tamil-ooty.png",
+      "description": "Scenic Nilgiri hills and tea gardens."
+    },
+    {
+      "id": "tamil-kanyakumari",
+      "name": "Kanyakumari",
+      "image": "background/tamil/tamil-kanyakumari.png",
+      "description": "The southernmost tip of India, Kanyakumari."
+    },
+    {
+      "id": "tamil-mahabalipuram",
+      "name": "Mahabalipuram",
+      "image": "background/tamil/tamil-mahabalipuram.png",
+      "description": "Shore Temple, Mahabalipuram - UNESCO site."
+    }
+  ]
+}
