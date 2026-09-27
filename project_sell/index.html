@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Saif's Store · Premium Products</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="store-wrapper">
+   <header class="store-header">
+  <div class="header-left">
+    <h1>
+      <span class="logo-icon"><i class="fab fa-whatsapp"></i></span>
+      Saif's Store
+    </h1>
+    <p class="store-tagline">Premium products · Delivered personally</p>
+  </div>
+ 
+</header>
+
+    <main id="appContent">
+      <div class="state-container">
+        <i class="fas fa-spinner fa-spin"></i>
+        <span class="state-title">Loading products…</span>
+      </div>
+    </main>
+  </div>
+
+  <!-- ============================================================
+       SINGLE COMMENT BOX (one form + WhatsApp button)
+       ============================================================ -->
+ <!-- ============================================================
+     SINGLE COMMENT BOX (one form + WhatsApp button + expand)
+     ============================================================ -->
+<section class="single-comment-box" id="singleCommentBox">
+  <div class="scb-header">
+    <span class="scb-icon"><i class="fas fa-comment-dots"></i></span>
+    <div class="scb-title-wrap">
+      <h3>Leave a comment</h3>
+      <p>Share your thoughts or ask a question</p>
+    </div>
+
+    <!-- ✨ Expand button -->
+    <button type="button" class="scb-expand-btn" id="scbExpandBtn" aria-label="Expand comment box" title="Expand">
+      <i class="fas fa-expand"></i>
+    </button>
+  </div>
+
+  <form class="scb-form" id="singleCommentForm" novalidate>
+    <input
+      type="text"
+      id="scbName"
+      name="name"
+      placeholder="Your name"
+      maxlength="40"
+      autocomplete="name"
+      required
+    >
+    <textarea
+      id="scbText"
+      name="text"
+      placeholder="Write your comment…"
+      maxlength="500"
+      rows="3"
+      required
+    ></textarea>
+
+    <div class="scb-actions">
+      <button type="submit" class="scb-submit">
+        <i class="fas fa-paper-plane"></i> Send
+      </button>
+
+      <button type="button" class="scb-wa-btn" id="scbWhatsappBtn">
+        <i class="fab fa-whatsapp"></i> WhatsApp
+      </button>
+    </div>
+  </form>
+
+  <div class="scb-feedback" id="scbFeedback" role="status" aria-live="polite"></div>
+</section>
+
+<!-- ============================================================
+     FULLSCREEN COMMENT VIEW (opens when user clicks Expand)
+     ============================================================ -->
+<div class="comment-modal" id="commentModal" aria-hidden="true" role="dialog">
+  <div class="cm-backdrop" data-cm-close></div>
+  <div class="cm-panel" role="document">
+    <div class="cm-header">
+      <div class="cm-title">
+        <i class="fas fa-comment-dots"></i>
+        <span>Leave a comment</span>
+      </div>
+      <button class="cm-close" id="cmCloseBtn" aria-label="Close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="cm-body">
+      <form class="scb-form" id="modalCommentForm" novalidate>
+        <input
+          type="text"
+          id="cmName"
+          name="name"
+          placeholder="Your name"
+          maxlength="40"
+          autocomplete="name"
+          required
+        >
+        <textarea
+          id="cmText"
+          name="text"
+          placeholder="Write your comment… (you can write as much as you want)"
+          rows="8"
+          required
+        ></textarea>
+
+        <div class="scb-actions">
+          <button type="submit" class="scb-submit">
+            <i class="fas fa-paper-plane"></i> Send
+          </button>
+
+          <button type="button" class="scb-wa-btn" id="cmWhatsappBtn">
+            <i class="fab fa-whatsapp"></i> WhatsApp
+          </button>
+        </div>
+      </form>
+
+      <div class="scb-feedback" id="cmFeedback" role="status" aria-live="polite"></div>
+    </div>
+  </div>
+</div>
+  <!-- ========== LIGHTBOX (full-screen image preview) ========== -->
+  <div class="lightbox" id="lightbox" aria-hidden="true" role="dialog">
+    <button class="lb-close" id="lbClose" aria-label="Close">
+      <i class="fas fa-times"></i>
+    </button>
+    <button class="lb-nav lb-prev" id="lbPrev" aria-label="Previous image">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+    <button class="lb-nav lb-next" id="lbNext" aria-label="Next image">
+      <i class="fas fa-chevron-right"></i>
+    </button>
+    <div class="lb-counter" id="lbCounter">1 / 1</div>
+    <div class="lb-caption" id="lbCaption"></div>
+    <div class="lb-stage" id="lbStage">
+      <img id="lbImage" src="" alt="Full view">
+    </div>
+  </div>
+
+    <footer class="store-footer">
+      <p>© 2026 <strong><a id = "saif" href="https://kdrix.online">Saif</a>'s Store</strong> · Premium quality, delivered personally.</p>
+    </footer>
+  <script src="comments.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+[
+  {
+    "id": "prod-001",
+    "name": "Dynamic Finance Tracker Web App",
+    "description": "Finance Tracker is a lightweight yet powerful personal finance application that runs entirely in the browser. It is designed for students, working professionals, and anyone who wants a clear, simple, and reliable way to manage their personal finances without the complexity of traditional accounting software.The app combines a clean, modern user interface with practical financial tools — giving you a real-time view of your income, spending, savings goals, and loan EMIs. It's fast, private, and works beautifully on any device.",
+    "price": "8999",
+    "photos": [
+      "./assets/finance/login.png",
+      "./assets/finance/login2.png",
+      "./assets/finance/signup.png",
+      "./assets/finance/d1.png",
+      "./assets/finance/d2.png",
+      "./assets/finance/d3.png",
+      "./assets/finance/d4.png",
+      "./assets/finance/d5.png",
+      "./assets/finance/d6.png",
+      "./assets/finance/email_varify.png",
+      "./assets/finance/forgot.png",
+      "./assets/finance/profile.png",
+      "./assets/finance/reset_varify.png",
+      "./assets/finance/reset.png"
+    ]
+  },
+  {
+    "id": "prod-002",
+    "name": "Dynamic Marge Mint - PDF Editor",
+    "description": "Seamlessly Convert & Merge — Powerful, responsive, and blazing-fast PDF utilities in your browser. Convert JPG, PNG, and WEBP images into professional PDFs with drag-and-drop ease. Features include multi-file upload, smart arrange, background fix, border, crop, watermark, quality control, visual filters, page settings, page numbers, one-click optimize, PDF preview, and PDF merging. Built with Python (Flask, Pillow, ReportLab, pypdf) on the backend and HTML, CSS, and vanilla JavaScript on the frontend. Deployed live on Netlify and Render. Mobile-first responsive UI — tested on Galaxy S24 Ultra. Future scope: AI Image Analyzer, Resume Builder, and OCR Text Extractor.",
+    "price": "7999",
+    "photos": [
+      "./assets/mergemint/s1.png",
+      "./assets/mergemint/s2.png",
+      "./assets/mergemint/s3.png",
+      "./assets/mergemint/s4.png",
+      "./assets/mergemint/s5.png",
+      "./assets/mergemint/s6.png",
+      "./assets/mergemint/s7.png",
+      "./assets/mergemint/s8.png"
+    ]
+  }
+]
