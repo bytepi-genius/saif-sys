@@ -36,5 +36,59 @@
       "./assets/mergemint/s7.png",
       "./assets/mergemint/s8.png"
     ]
+  },
+  {
+    "id": "prod-003",
+    "name": "API Based Equation-Graph Generator",
+    "description": "Interactive Graph Plotter is a web-based mathematical graph visualization tool developed using HTML5, CSS3, JavaScript, and a Mathematics API to provide real-time visualization of mathematical equations and functions. The system allows users to enter equations such as sin(x), cos(x), tan(x), polynomial, exponential, logarithmic, and other mathematical functions and instantly generate their corresponding live graphs without refreshing the page. It supports 9 different graph formats, providing flexible ways to visualize and analyze mathematical expressions. The application also includes interactive graph controls, real-time equation processing, responsive design, and the ability to save generated graphs as PDF, making it a useful and user-friendly platform for learning, analyzing, and visualizing mathematical concepts.",
+    "price": "5999",
+    "photos": [
+      "./assets/plotteriq/p1.png",
+      "./assets/plotteriq/p2.png",
+      "./assets/plotteriq/p3.png",
+      "./assets/plotteriq/p4.png",
+      "./assets/plotteriq/p5.png",
+      "./assets/plotteriq/p6.png",
+      "./assets/plotteriq/p7.png",
+      "./assets/plotteriq/p8.png"
+    ]
+  },
+  {
+    "id": "prod-004",
+    "name": "e-learning application - ready4stud",
+    "description": "Ready4Study is an e-learning application designed to provide students with an easy, interactive, and accessible platform for digital learning. The application is developed using XML for the frontend, Java for the backend, and Firebase as the database for storing and managing application data. It can provide students with access to learning materials, courses, study resources, and other educational content through a user-friendly interface. The main objective of Ready4Study is to make online education more convenient, organized, and accessible while providing students with a reliable platform for improving their knowledge and academic skills.",
+    "price": "9999",
+    "photos": [
+      "./assets/learningapp/p1.png",
+      "./assets/learningapp/p2.png",
+      "./assets/learningapp/p3.png",
+      "./assets/learningapp/p4.png",
+      "./assets/learningapp/p5.png",
+      "./assets/learningapp/p6.png",
+      "./assets/learningapp/p7.png",
+      "./assets/learningapp/p8.png",
+      "./assets/learningapp/p9.png",
+      "./assets/learningapp/p10.png",
+      "./assets/learningapp/p11.png",
+      "./assets/learningapp/p12.png",
+      "./assets/learningapp/p13.png",
+      "./assets/learningapp/p14.png",
+      "./assets/learningapp/p15.png",
+      "./assets/learningapp/p16.png",
+      "./assets/learningapp/p17.png",
+      "./assets/learningapp/p18.png",
+      "./assets/learningapp/p19.png",
+      "./assets/learningapp/p20.png",
+      "./assets/learningapp/p21.png",
+      "./assets/learningapp/p22.png",
+      "./assets/learningapp/p23.png",
+      "./assets/learningapp/p24.png",
+      "./assets/learningapp/p25.png",
+      "./assets/learningapp/p26.png",
+      "./assets/learningapp/p27.png",
+      "./assets/learningapp/p28.png",
+      "./assets/learningapp/p29.png",
+      "./assets/learningapp/p30.png"
+    ]
   }
 ]
