@@ -1,9 +1,9 @@
 [
   {
     "id": "prod-001",
-    "name": "Dynamic Finance Tracker Web App",
+    "name": "Dynamic Finance Tracker Web App [ Mysql  PHP  HTML  CSS  JS ]",
     "description": "Finance Tracker is a lightweight yet powerful personal finance application that runs entirely in the browser. It is designed for students, working professionals, and anyone who wants a clear, simple, and reliable way to manage their personal finances without the complexity of traditional accounting software.The app combines a clean, modern user interface with practical financial tools — giving you a real-time view of your income, spending, savings goals, and loan EMIs. It's fast, private, and works beautifully on any device.",
-    "price": "8999",
+    "price": "5999",
     "photos": [
       "./assets/finance/login.png",
       "./assets/finance/login2.png",
@@ -23,9 +23,9 @@
   },
   {
     "id": "prod-002",
-    "name": "Dynamic Marge Mint - PDF Editor",
+    "name": "Dynamic Marge Mint - PDF Editor - [ Python  Html CSS JS ]",
     "description": "Seamlessly Convert & Merge — Powerful, responsive, and blazing-fast PDF utilities in your browser. Convert JPG, PNG, and WEBP images into professional PDFs with drag-and-drop ease. Features include multi-file upload, smart arrange, background fix, border, crop, watermark, quality control, visual filters, page settings, page numbers, one-click optimize, PDF preview, and PDF merging. Built with Python (Flask, Pillow, ReportLab, pypdf) on the backend and HTML, CSS, and vanilla JavaScript on the frontend. Deployed live on Netlify and Render. Mobile-first responsive UI — tested on Galaxy S24 Ultra. Future scope: AI Image Analyzer, Resume Builder, and OCR Text Extractor.",
-    "price": "7999",
+    "price": "6999",
     "photos": [
       "./assets/mergemint/s1.png",
       "./assets/mergemint/s2.png",
@@ -39,9 +39,9 @@
   },
   {
     "id": "prod-003",
-    "name": "API Based Equation-Graph Generator",
+    "name": "API Based Equation-Graph Generator [ HTML CSS JS API ]",
     "description": "Interactive Graph Plotter is a web-based mathematical graph visualization tool developed using HTML5, CSS3, JavaScript, and a Mathematics API to provide real-time visualization of mathematical equations and functions. The system allows users to enter equations such as sin(x), cos(x), tan(x), polynomial, exponential, logarithmic, and other mathematical functions and instantly generate their corresponding live graphs without refreshing the page. It supports 9 different graph formats, providing flexible ways to visualize and analyze mathematical expressions. The application also includes interactive graph controls, real-time equation processing, responsive design, and the ability to save generated graphs as PDF, making it a useful and user-friendly platform for learning, analyzing, and visualizing mathematical concepts.",
-    "price": "5999",
+    "price": "4999",
     "photos": [
       "./assets/plotteriq/p1.png",
       "./assets/plotteriq/p2.png",
@@ -55,9 +55,9 @@
   },
   {
     "id": "prod-004",
-    "name": "e-learning application - ready4stud",
+    "name": "Android e-learning application - ready4stud [ Kotlin ]",
     "description": "Ready4Study is an e-learning application designed to provide students with an easy, interactive, and accessible platform for digital learning. The application is developed using XML for the frontend, Java for the backend, and Firebase as the database for storing and managing application data. It can provide students with access to learning materials, courses, study resources, and other educational content through a user-friendly interface. The main objective of Ready4Study is to make online education more convenient, organized, and accessible while providing students with a reliable platform for improving their knowledge and academic skills.",
-    "price": "9999",
+    "price": "7999",
     "photos": [
       "./assets/learningapp/p1.png",
       "./assets/learningapp/p2.png",
@@ -89,6 +89,20 @@
       "./assets/learningapp/p28.png",
       "./assets/learningapp/p29.png",
       "./assets/learningapp/p30.png"
+    ]
+  },
+  {
+    "id": "prod-005",
+    "name": "PixelShrink- Web App [ Python  React ]",
+    "description": "Interactive Graph Plotter is a web-based mathematical graph visualization tool developed using HTML5, CSS3, JavaScript, and a Mathematics API to provide real-time visualization of mathematical equations and functions. The system allows users to enter equations such as sin(x), cos(x), tan(x), polynomial, exponential, logarithmic, and other mathematical functions and instantly generate their corresponding live graphs without refreshing the page. It supports 9 different graph formats, providing flexible ways to visualize and analyze mathematical expressions. The application also includes interactive graph controls, real-time equation processing, responsive design, and the ability to save generated graphs as PDF, making it a useful and user-friendly platform for learning, analyzing, and visualizing mathematical concepts.",
+    "price": "4999",
+    "photos": [
+      "./assets/pixelshrink/p1.png",
+      "./assets/pixelshrink/p2.png",
+      "./assets/pixelshrink/p3.png",
+      "./assets/pixelshrink/p4.png",
+      "./assets/pixelshrink/p5.png",
+      "./assets/pixelshrink/p6.png"
     ]
   }
 ]
