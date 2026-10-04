@@ -57,7 +57,7 @@
     "id": "prod-004",
     "name": "Android e-learning application - ready4stud [ Kotlin ]",
     "description": "Ready4Study is an e-learning application designed to provide students with an easy, interactive, and accessible platform for digital learning. The application is developed using XML for the frontend, Java for the backend, and Firebase as the database for storing and managing application data. It can provide students with access to learning materials, courses, study resources, and other educational content through a user-friendly interface. The main objective of Ready4Study is to make online education more convenient, organized, and accessible while providing students with a reliable platform for improving their knowledge and academic skills.",
-    "price": "7999",
+    "price": "8999",
     "photos": [
       "./assets/learningapp/p1.png",
       "./assets/learningapp/p2.png",
@@ -90,19 +90,41 @@
       "./assets/learningapp/p29.png",
       "./assets/learningapp/p30.png"
     ]
-  },
-  {
-    "id": "prod-005",
-    "name": "PixelShrink- Web App [ Python  React ]",
-    "description": "Interactive Graph Plotter is a web-based mathematical graph visualization tool developed using HTML5, CSS3, JavaScript, and a Mathematics API to provide real-time visualization of mathematical equations and functions. The system allows users to enter equations such as sin(x), cos(x), tan(x), polynomial, exponential, logarithmic, and other mathematical functions and instantly generate their corresponding live graphs without refreshing the page. It supports 9 different graph formats, providing flexible ways to visualize and analyze mathematical expressions. The application also includes interactive graph controls, real-time equation processing, responsive design, and the ability to save generated graphs as PDF, making it a useful and user-friendly platform for learning, analyzing, and visualizing mathematical concepts.",
-    "price": "4999",
-    "photos": [
-      "./assets/pixelshrink/p1.png",
-      "./assets/pixelshrink/p2.png",
-      "./assets/pixelshrink/p3.png",
-      "./assets/pixelshrink/p4.png",
-      "./assets/pixelshrink/p5.png",
-      "./assets/pixelshrink/p6.png"
+  },{
+  "id": "prod-005",
+  "name": "PixelShrink - Web App [ Python Fast API  React JS ]",
+  "description": "PixelShrink is a high-performance web-based image compression and optimization tool built using React for a fluid user interface and Python for robust backend processing. The platform allows users to upload single or multiple images, adjust compression quality metrics, and instantly shrink file sizes while preserving visual clarity. Featuring intelligent batch processing, real-time live previews, and drag-and-drop functionality, it provides an intuitive solution for web developers, photographers, and content creators looking to optimize media assets for faster web performance.",
+  "price": "4999",
+  "photos": [
+    "./assets/pixelshrink/p1.png",
+    "./assets/pixelshrink/p2.png",
+    "./assets/pixelshrink/p3.png",
+    "./assets/pixelshrink/p4.png",
+    "./assets/pixelshrink/p5.png",
+    "./assets/pixelshrink/p6.png"
+  
     ]
-  }
+  },{
+  "id": "prod-006",
+  "name": "PixelEdit — Image Editor [ React JS  Python FastAPI ]",
+  "description": "PixelEdit is a privacy-first, browser-based image editing web application built with React, Vite, and a Python FastAPI backend. It enables users to resize, crop, rotate, adjust, and compress images entirely in the browser or on a local server — no accounts, no database, and no permanent image storage. The editor includes a professional tool rail with live adjustments for brightness, contrast, saturation, and sharpness, plus 10+ one-click filters such as grayscale, sepia, cinematic, vintage, and dramatic. Users can add text, shapes, and watermarks with drag-to-position placement, draw freehand on the canvas, and apply blur, pixelate, or sharpen effects. Advanced features include a multi-step undo/redo history, a draggable before/after comparison slider, and a full export dialog supporting JPEG, PNG, WebP, BMP, and TIFF with adjustable quality. The frontend uses the HTML5 Canvas API for local previews and only falls back to the FastAPI backend for heavy operations, where every uploaded file is written to a temporary folder and deleted immediately after processing. Fully responsive with a dedicated mobile toolbar, PixelEdit is ideal for developers, designers, students, and anyone who needs a fast, private, and self-contained image editing tool.",
+  "price": "7999",
+  "photos": [
+    "./assets/imageedit/p1.png",
+    "./assets/imageedit/p2.png",
+    "./assets/imageedit/p3.png",
+    "./assets/imageedit/p4.png",
+    "./assets/imageedit/p5.png",
+    "./assets/imageedit/p6.png",
+    "./assets/imageedit/p7.png",
+    "./assets/imageedit/p8.png",
+    "./assets/imageedit/p9.png",
+    "./assets/imageedit/p10.png",
+    "./assets/imageedit/p11.png",
+    "./assets/imageedit/p12.png",
+    "./assets/imageedit/p13.png",
+    "./assets/imageedit/p14.png",
+    "./assets/imageedit/p15.png"
+  ]
+}
 ]
