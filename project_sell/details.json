@@ -105,26 +105,21 @@
   
     ]
   },{
-  "id": "prod-006",
-  "name": "PixelEdit — Image Editor [ React JS  Python FastAPI ]",
-  "description": "PixelEdit is a privacy-first, browser-based image editing web application built with React, Vite, and a Python FastAPI backend. It enables users to resize, crop, rotate, adjust, and compress images entirely in the browser or on a local server — no accounts, no database, and no permanent image storage. The editor includes a professional tool rail with live adjustments for brightness, contrast, saturation, and sharpness, plus 10+ one-click filters such as grayscale, sepia, cinematic, vintage, and dramatic. Users can add text, shapes, and watermarks with drag-to-position placement, draw freehand on the canvas, and apply blur, pixelate, or sharpen effects. Advanced features include a multi-step undo/redo history, a draggable before/after comparison slider, and a full export dialog supporting JPEG, PNG, WebP, BMP, and TIFF with adjustable quality. The frontend uses the HTML5 Canvas API for local previews and only falls back to the FastAPI backend for heavy operations, where every uploaded file is written to a temporary folder and deleted immediately after processing. Fully responsive with a dedicated mobile toolbar, PixelEdit is ideal for developers, designers, students, and anyone who needs a fast, private, and self-contained image editing tool.",
-  "price": "7999",
+  "id": "prod-007",
+  "name": "ChatApp — Real-Time Chat [ React JS · Python FastAPI · Socket.IO · Redis · MySQL ]",
+  "description": "ChatApp is a full-stack, real-time messaging platform built with React, Vite, and Tailwind CSS on the frontend and Python FastAPI with Socket.IO, Redis, and MySQL on the backend. It delivers instant one-to-one and group messaging with live delivery, typing indicators, presence, and read receipts — powered by a Redis Pub/Sub adapter that keeps multiple Socket.IO servers in sync. Users can share images and files with inline previews, reply to specific messages with scroll-to-context highlighting, react with emojis that persist across sessions, and delete messages either for themselves or for everyone with proper soft-delete semantics. Group chats support creator/admin/member roles, per-member permissions (add, remove, send), custom avatars, descriptions, and full member CRUD. A dedicated poll system lets users create single or multiple-choice polls with optional anonymity, auto-close timers, live percentage results, voter insights, and creator-only controls. Security is handled with bcrypt password hashing, JWT authentication, membership checks on every socket event, rate limiting via Redis, and CORS restricted to trusted origins. The UI is fully mobile-responsive with a slide-in sidebar, glassmorphism surfaces, animated typing dots, image lightboxes, chat wallpapers with adjustable blur and darkness, and customizable accent colors — all persisted per user. A built-in notification system combines in-app toasts, unread badges, and browser push (VAPID) so users never miss a message. Ideal for teams, friend groups, study circles, and anyone who wants a fast, private, self-hostable alternative to mainstream messaging apps.",
+  "price": "9999",
   "photos": [
-    "./assets/imageedit/p1.png",
-    "./assets/imageedit/p2.png",
-    "./assets/imageedit/p3.png",
-    "./assets/imageedit/p4.png",
-    "./assets/imageedit/p5.png",
-    "./assets/imageedit/p6.png",
-    "./assets/imageedit/p7.png",
-    "./assets/imageedit/p8.png",
-    "./assets/imageedit/p9.png",
-    "./assets/imageedit/p10.png",
-    "./assets/imageedit/p11.png",
-    "./assets/imageedit/p12.png",
-    "./assets/imageedit/p13.png",
-    "./assets/imageedit/p14.png",
-    "./assets/imageedit/p15.png"
+    "./assets/Chatapp/p1.png",
+    "./assets/Chatapp/p2.png",
+    "./assets/Chatapp/p3.png",
+    "./assets/Chatapp/p4.png",
+    "./assets/Chatapp/p5.png",
+    "./assets/Chatapp/p6.png",
+    "./assets/Chatapp/p7.png",
+    "./assets/Chatapp/p8.png",
+    "./assets/Chatapp/p9.png",
+    "./assets/Chatapp/p10.png"
   ]
 }
 ]
