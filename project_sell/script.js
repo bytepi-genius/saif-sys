@@ -1,3 +1,7 @@
+/* =========================================================
+   SAIF'S STORE — Interactive Script (v2, dark-neon edition)
+   Drop-in replacement · Same DOM contract
+   ========================================================= */
 (function () {
   "use strict";
 
@@ -10,6 +14,7 @@
   const MIN_PHOTOS = 5;
   const MAX_PHOTOS = 20;
   const DESC_CLAMP_LENGTH = 120; // chars above this → "Read more"
+  const MAX_VISIBLE_BADGES = 6;  // badges shown before "+N more"
 
   /* =========================================================
      DOM
@@ -33,6 +38,8 @@
   let productsData = [];
   let lbItems = [];
   let lbIndex = 0;
+  let lbZoomed = false;
+  let lbAutoplay = null;
 
   /* =========================================================
      UTILITIES
@@ -52,8 +59,24 @@
       return { display: "Ask for price", hasCurrency: false };
     }
     const str = String(price).trim();
-    if (/[₹$€£¥]/.test(str)) return { display: str, hasCurrency: true };
-    if (/^[\d,]+(\.\d+)?$/.test(str)) return { display: "₹" + str, hasCurrency: true };
+
+    // Already has a currency symbol
+    if (/[₹$€£¥₩₽]/.test(str)) {
+      return { display: str, hasCurrency: true };
+    }
+
+    // Plain number → add ₹ and thousand separators
+    if (/^[\d,]+(\.\d+)?$/.test(str)) {
+      const numeric = Number(str.replace(/,/g, ""));
+      if (!Number.isNaN(numeric) && numeric >= 1000) {
+        return {
+          display: "₹" + numeric.toLocaleString("en-IN"),
+          hasCurrency: true,
+        };
+      }
+      return { display: "₹" + str, hasCurrency: true };
+    }
+
     return { display: str, hasCurrency: false };
   }
 
@@ -142,7 +165,7 @@
       try {
         await navigator.share({ title, text, url });
       } catch (err) {
-        // User cancelled
+        // User cancelled — silent
       }
     } else {
       copyProductLink(product, index, btnEl);
@@ -164,7 +187,13 @@
      NORMALIZE PHOTOS
      ========================================================= */
   function normalizePhotos(product) {
-    let photos = product.photos || product.images || product.image || [];
+    let photos =
+      product.photos ||
+      product.images ||
+      product.gallery ||
+      product.image ||
+      [];
+
     if (!Array.isArray(photos)) photos = [photos];
 
     photos = photos
@@ -172,13 +201,17 @@
       .filter((p) => p !== null);
 
     if (photos.length > MAX_PHOTOS) {
-      console.warn(`⚠️ "${product.name}" has ${photos.length} photos — trimming to ${MAX_PHOTOS}`);
+      console.warn(
+        `⚠️ "${product.name}" has ${photos.length} photos — trimming to ${MAX_PHOTOS}`
+      );
       photos = photos.slice(0, MAX_PHOTOS);
     }
 
     const tooFew = photos.length < MIN_PHOTOS;
     if (tooFew) {
-      console.warn(`⚠️ "${product.name}" has ${photos.length} photos (min ${MIN_PHOTOS})`);
+      console.warn(
+        `⚠️ "${product.name}" has ${photos.length} photos (min ${MIN_PHOTOS})`
+      );
     }
 
     if (photos.length === 0) return { photos: [null], tooFew: true };
@@ -195,7 +228,8 @@
     const totalPhotos = photos.length;
 
     const title = escapeHtml(product.name || "Untitled Product");
-    const rawDescription = product.description || "No description available for this product.";
+    const rawDescription =
+      product.description || "No description available for this product.";
     const description = escapeHtml(rawDescription);
     const isLongDescription = rawDescription.length > DESC_CLAMP_LENGTH;
     const priceInfo = formatPrice(product.price);
@@ -209,7 +243,7 @@
               onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\\'img-fallback\\'><i class=\\'fas fa-image\\'></i><span>Image not found</span></div>';">`
       : `<div class="img-fallback"><i class="fas fa-image"></i><span>No image</span></div>`;
 
-    /* ---- 40×40 thumbnails ---- */
+    /* ---- thumbnails ---- */
     let thumbsHtml = "";
     photos.forEach((photo, i) => {
       if (photo === null) {
@@ -265,11 +299,86 @@
           : ""
       }`;
 
+    /* ---- tech badges ---- */
+    const badges = Array.isArray(product.tech) ? product.tech : [];
+    const hiddenCount = Math.max(0, badges.length - MAX_VISIBLE_BADGES);
+
+    let badgesHtml = "";
+    if (badges.length) {
+      const badgesContent = badges
+        .map((t, i) => {
+          const cls =
+            i === 0
+              ? "tech-badge primary"
+              : i % 2
+              ? "tech-badge accent"
+              : "tech-badge";
+          return `<span class="${cls}">${escapeHtml(t)}</span>`;
+        })
+        .join("");
+
+      badgesHtml = `
+        <div class="tech-badges${hiddenCount ? " collapsed" : ""}" data-badges>
+          ${badgesContent}
+        </div>
+        ${
+          hiddenCount
+            ? `<button type="button" class="tech-badges-toggle" data-badges-toggle>
+                 +${hiddenCount} more
+               </button>`
+            : ""
+        }`;
+    }
+
+    /* ---- meta row ---- */
+    const metaParts = [];
+    if (totalPhotos > 1) {
+      metaParts.push(
+        `<span class="meta-item"><i class="fas fa-images"></i> ${totalPhotos} photos</span>`
+      );
+    }
+    if (product.category) {
+      metaParts.push(
+        `<span class="meta-item"><i class="fas fa-tag"></i> ${escapeHtml(
+          product.category
+        )}</span>`
+      );
+    }
+    if (product.updated) {
+      metaParts.push(
+        `<span class="meta-item"><i class="fas fa-clock"></i> Updated ${escapeHtml(
+          product.updated
+        )}</span>`
+      );
+    }
+
+    const metaHtml = metaParts.length
+      ? `<div class="product-meta">${metaParts.join(
+          '<span class="meta-dot"></span>'
+        )}</div>`
+      : "";
+
+    /* ---- trust strip ---- */
+    const trustItems = Array.isArray(product.trust) ? product.trust : [];
+    const trustHtml = trustItems.length
+      ? `<div class="product-trust">
+           ${trustItems
+             .map(
+               (t) =>
+                 `<span class="trust-item"><i class="fas fa-check-circle"></i> ${escapeHtml(
+                   t
+                 )}</span>`
+             )
+             .join("")}
+         </div>`
+      : "";
+
     return `
-      <article class="product-card" data-card-index="${index}"
+      <article class="product-card${product.featured ? " featured" : ""}"
+               data-card-index="${index}"
                id="product-${escapeHtml(product.id || "p-" + index)}"
                style="animation-delay:${Math.min(index * 60, 400)}ms">
-        <div class="gallery-container" data-gallery>
+        <div class="gallery-container" data-gallery tabindex="0" aria-label="Image gallery">
           <div class="gallery-preview" data-preview>
             ${previewHtml}
           </div>
@@ -285,7 +394,13 @@
         <div class="product-info">
           <h2 class="product-title">${title}</h2>
 
+          ${metaHtml}
+
           ${descHtml}
+
+          ${badgesHtml}
+
+          ${trustHtml}
 
           <div class="price-row">${priceHtml}</div>
 
@@ -308,6 +423,41 @@
   }
 
   /* =========================================================
+     SKELETON LOADER
+     ========================================================= */
+  function renderSkeleton() {
+    const skeleton = `
+      <div class="product-grid">
+        ${Array.from({ length: 2 })
+          .map(
+            () => `
+          <article class="product-card skeleton">
+            <div class="gallery-container">
+              <div class="gallery-preview shimmer"></div>
+              <div class="gallery-thumbs">
+                ${Array.from({ length: 5 })
+                  .map(
+                    () =>
+                      `<div class="gallery-thumb shimmer" style="border:none"></div>`
+                  )
+                  .join("")}
+              </div>
+            </div>
+            <div class="product-info">
+              <div class="shimmer" style="height:20px;border-radius:6px;width:80%"></div>
+              <div class="shimmer" style="height:14px;border-radius:6px;width:100%"></div>
+              <div class="shimmer" style="height:14px;border-radius:6px;width:95%"></div>
+              <div class="shimmer" style="height:14px;border-radius:6px;width:70%"></div>
+              <div class="shimmer" style="height:44px;border-radius:999px;width:100%;margin-top:8px"></div>
+            </div>
+          </article>`
+          )
+          .join("")}
+      </div>`;
+    appContent.innerHTML = skeleton;
+  }
+
+  /* =========================================================
      RENDER
      ========================================================= */
   function renderProducts(products) {
@@ -323,21 +473,23 @@
 
     productsData = products;
     let cardsHtml = "";
-    products.forEach((p, i) => { cardsHtml += createProductCard(p, i); });
+    products.forEach((p, i) => {
+      cardsHtml += createProductCard(p, i);
+    });
     appContent.innerHTML = `<div class="product-grid">${cardsHtml}</div>`;
 
     initGalleries();
     initActionButtons();
-    initDescToggles();   // ✅ YE ADD KIYA — Read more kaam karega
+    initDescToggles();
   }
 
   /* =========================================================
-     GALLERY — big preview + 40×40 thumbnails
+     GALLERY
      ========================================================= */
   function initGalleries() {
     document.querySelectorAll("[data-gallery]").forEach((gallery) => {
-      const preview   = gallery.querySelector("[data-preview]");
-      const thumbs    = gallery.querySelectorAll("[data-thumb-index]");
+      const preview = gallery.querySelector("[data-preview]");
+      const thumbs = gallery.querySelectorAll("[data-thumb-index]");
       const counterEl = gallery.querySelector("[data-counter]");
       if (!preview || !thumbs.length) return;
 
@@ -351,7 +503,9 @@
         const fullSrc = thumb.getAttribute("data-full-src");
 
         if (fullSrc) {
-          preview.innerHTML = `<img src="${fullSrc}" alt="Preview ${idx + 1}" loading="lazy">`;
+          preview.innerHTML = `<img src="${fullSrc}" alt="Preview ${
+            idx + 1
+          }" loading="lazy">`;
         } else {
           preview.innerHTML = `<div class="img-fallback"><i class="fas fa-image"></i><span>No image</span></div>`;
         }
@@ -382,8 +536,22 @@
         if (!items.length) return;
 
         const title =
-          gallery.closest(".product-card")?.querySelector(".product-title")?.textContent || "";
+          gallery.closest(".product-card")?.querySelector(".product-title")
+            ?.textContent || "";
         openLightbox(items, currentIndex, title);
+      });
+
+      // Keyboard navigation when the gallery is focused
+      gallery.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowRight") {
+          e.preventDefault();
+          setActive(Math.min(currentIndex + 1, thumbs.length - 1));
+        } else if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          setActive(Math.max(currentIndex - 1, 0));
+        } else if (e.key === "Enter") {
+          preview.click();
+        }
       });
 
       setActive(0);
@@ -395,10 +563,7 @@
      ========================================================= */
   function initDescToggles() {
     const buttons = document.querySelectorAll("[data-desc-toggle]");
-    console.log("🔍 Read more buttons found:", buttons.length); // debug
-
     buttons.forEach((btn) => {
-      // Prevent double-wiring
       if (btn.dataset.wired === "1") return;
       btn.dataset.wired = "1";
 
@@ -425,7 +590,7 @@
   }
 
   /* =========================================================
-     ACTION BUTTONS — WhatsApp, Copy, Share
+     ACTION BUTTONS — WhatsApp, Copy, Share, Badge toggle
      ========================================================= */
   function initActionButtons() {
     // WhatsApp
@@ -458,6 +623,20 @@
         if (product) shareProduct(product, idx, btn);
       });
     });
+
+    // Tech badges toggle
+    document.querySelectorAll("[data-badges-toggle]").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        const wrap = btn.closest(".product-info");
+        const badgesEl = wrap?.querySelector("[data-badges]");
+        if (!badgesEl) return;
+        const isCollapsed = badgesEl.classList.toggle("collapsed");
+        const total = badgesEl.querySelectorAll(".tech-badge").length;
+        const hidden = Math.max(0, total - MAX_VISIBLE_BADGES);
+        btn.textContent = isCollapsed ? `+${hidden} more` : "Show less";
+      });
+    });
   }
 
   /* =========================================================
@@ -466,6 +645,7 @@
   function openLightbox(items, startIndex, title) {
     lbItems = items;
     lbIndex = startIndex;
+    lbZoomed = false;
     if (lbCaption) lbCaption.textContent = title || "";
     updateLightbox();
     lightbox.classList.add("open");
@@ -474,10 +654,14 @@
   }
 
   function closeLightbox() {
+    stopAutoplay();
     lightbox.classList.remove("open");
     lightbox.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
-    if (lbImage) lbImage.src = "";
+    if (lbImage) {
+      lbImage.src = "";
+      lbImage.style.transform = "";
+    }
   }
 
   function updateLightbox() {
@@ -485,6 +669,8 @@
     const item = lbItems[lbIndex];
     lbImage.src = item.src;
     lbImage.alt = item.alt || "Product image";
+    lbImage.style.transform = "";
+    lbZoomed = false;
     if (lbCounter) lbCounter.textContent = `${lbIndex + 1} / ${lbItems.length}`;
   }
 
@@ -500,9 +686,43 @@
     updateLightbox();
   }
 
+  function toggleZoom() {
+    if (!lbImage) return;
+    lbZoomed = !lbZoomed;
+    lbImage.style.transform = lbZoomed ? "scale(1.8)" : "";
+    lbImage.style.cursor = lbZoomed ? "zoom-out" : "zoom-in";
+  }
+
+  function startAutoplay() {
+    if (lbAutoplay) return;
+    lbAutoplay = setInterval(nextLightbox, 4000);
+  }
+
+  function stopAutoplay() {
+    if (lbAutoplay) {
+      clearInterval(lbAutoplay);
+      lbAutoplay = null;
+    }
+  }
+
   if (lbClose) lbClose.addEventListener("click", closeLightbox);
-  if (lbNext)  lbNext.addEventListener("click", (e) => { e.stopPropagation(); nextLightbox(); });
-  if (lbPrev)  lbPrev.addEventListener("click", (e) => { e.stopPropagation(); prevLightbox(); });
+  if (lbNext)
+    lbNext.addEventListener("click", (e) => {
+      e.stopPropagation();
+      nextLightbox();
+    });
+  if (lbPrev)
+    lbPrev.addEventListener("click", (e) => {
+      e.stopPropagation();
+      prevLightbox();
+    });
+  if (lbImage) {
+    lbImage.style.cursor = "zoom-in";
+    lbImage.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleZoom();
+    });
+  }
 
   if (lightbox) {
     lightbox.addEventListener("click", (e) => {
@@ -515,21 +735,33 @@
     if (e.key === "Escape") closeLightbox();
     else if (e.key === "ArrowRight") nextLightbox();
     else if (e.key === "ArrowLeft") prevLightbox();
+    else if (e.key === " " || e.code === "Space") {
+      e.preventDefault();
+      lbAutoplay ? stopAutoplay() : startAutoplay();
+    } else if (e.key === "z" || e.key === "Z") toggleZoom();
   });
 
   // Swipe on mobile
   let touchStartX = 0;
   if (lbStage) {
-    lbStage.addEventListener("touchstart", (e) => {
-      touchStartX = e.touches[0].clientX;
-    }, { passive: true });
-    lbStage.addEventListener("touchend", (e) => {
-      const dx = e.changedTouches[0].clientX - touchStartX;
-      if (Math.abs(dx) > 50) {
-        if (dx < 0) nextLightbox();
-        else prevLightbox();
-      }
-    }, { passive: true });
+    lbStage.addEventListener(
+      "touchstart",
+      (e) => {
+        touchStartX = e.touches[0].clientX;
+      },
+      { passive: true }
+    );
+    lbStage.addEventListener(
+      "touchend",
+      (e) => {
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        if (Math.abs(dx) > 50) {
+          if (dx < 0) nextLightbox();
+          else prevLightbox();
+        }
+      },
+      { passive: true }
+    );
   }
 
   /* =========================================================
@@ -548,10 +780,13 @@
     }
   }
 
+  window.addEventListener("hashchange", handleHashScroll);
+
   /* =========================================================
      LOAD JSON
      ========================================================= */
   async function loadProducts() {
+    renderSkeleton();
     try {
       const res = await fetch(JSON_PATH, { cache: "no-store" });
       if (!res.ok) throw new Error(`HTTP ${res.status} — ${res.statusText}`);
@@ -573,10 +808,15 @@
           <span class="state-title">Could not load products</span>
           <span class="state-sub">
             ${escapeHtml(err.message)}<br><br>
-            Make sure <strong>details.json</strong> is next to this HTML file, and that you
-            serve the page via a local server (not <code>file://</code>).
+            Make sure <strong>details.json</strong> is next to this HTML file,
+            and that you serve the page via a local server (not <code>file://</code>).
           </span>
+          <button class="wa-header-btn" id="retryBtn" style="margin-top:12px">
+            <i class="fas fa-rotate-right"></i> Retry
+          </button>
         </div>`;
+      const retryBtn = document.getElementById("retryBtn");
+      if (retryBtn) retryBtn.addEventListener("click", loadProducts);
     }
   }
 
