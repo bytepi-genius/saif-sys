@@ -274,6 +274,11 @@ body::after {
     transform var(--dur) var(--ease),
     box-shadow var(--dur) var(--ease),
     border-color var(--dur) var(--ease);
+  background: var(--surface);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Glow border on hover */
@@ -593,11 +598,13 @@ body::after {
   pointer-events: none;
 }
 
+/* Expanded state — full text visible */
 .product-desc.expanded {
   display: block;
   -webkit-line-clamp: unset;
-  max-height: 500px;
+  max-height: none;
   overflow: visible;
+  -webkit-box-orient: initial;
 }
 
 .desc-toggle {
@@ -671,12 +678,12 @@ body::after {
 
 /* Price row */
 .price-row {
-  display: flex;
+ display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-top: auto;
-  padding-top: 16px;
+  margin-top: auto;         /* ← yahi badla */
+  padding-top: 14px;
   border-top: 1px dashed var(--border);
 }
 
@@ -1328,6 +1335,7 @@ body::after {
   .product-grid {
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 24px;
+    align-items: start;
   }
 }
 
@@ -1347,9 +1355,22 @@ body::after {
   .wa-header-btn { padding: 11px 20px; font-size: 0.9rem; }
 
   .product-grid { grid-template-columns: 1fr; gap: 22px; }
+.product-info {
+  padding: 22px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+}.product-info { padding: 20px; }
+  .product-title {  
+     font-size: 1.28rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  }
 
-  .product-info { padding: 20px; }
-  .product-title { font-size: 1.14rem; }
   .price-tag { font-size: 1.5rem; }
 
   .wa-product-btn { padding: 13px 16px; font-size: 0.9rem; }
